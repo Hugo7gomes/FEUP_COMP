@@ -36,7 +36,7 @@ public class Launcher {
 
         // Parse stage
         JmmParserResult parserResult = parser.parse(code, config);
-        
+
         TestUtils.noErrors(parserResult.getReports());
 
         // ... add remaining stages
