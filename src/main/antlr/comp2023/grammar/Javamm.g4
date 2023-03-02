@@ -10,52 +10,52 @@ ID : [a-zA-Z_][a-zA-Z_0-9]* ;
 WS : [ \t\n\r\f]+ -> skip ;
 
 program
-    : importDeclaration* classDeclaration EOF;
+    : (importDeclaration)* classDeclaration EOF;
 
 importDeclaration
-    : ('import' ID ('.'ID)* ';');
+    : ('import' ID ('.'ID)* ';') #Import;
 
 classDeclaration
-    : 'class' ID ('extends' ID)? '{'(varDeclaration)* (methodDeclaration)*'}';
+    : 'class' name=ID ('extends' extendsName=ID)? '{'(varDeclaration)* (methodDeclaration)*'}' #Class;
 
 varDeclaration
-    : type ID';';
+    : type value=ID';' #Declaration;
 
 methodDeclaration
-    : ('public')? type ID '(' (type ID (',' type ID)*)? ')' '{' (varDeclaration)*
+    : ('public')? type value=ID '(' (type value=ID (',' type value=ID)*)? ')' '{' (varDeclaration)*
     (statement)* 'return' expression ';' '}'
     | ('public')? 'static' 'void' 'main' '(' 'String' '['']' ID ')' '{' (varDeclaration)* (statement)* '}';
 
 type
-    : 'int' '['']'
-    | 'boolean'
-    | 'int'
-    | 'String'
-    | ID;
+    : 'int' '['']' #ArrayType
+    | 'boolean' #BooleanType
+    | 'int' #IntegerType
+    | 'String' #StringType
+    | ID #IdentifierType;
 
 statement
-    : '{' (statement)* '}'
-    | 'if' '(' expression ')' statement 'else' statement
-    | 'while' '(' expression ')' statement
-    | expression ';'
-    | ID '=' expression ';'
-    | ID '[' expression ']' '=' expression ';';
+    : '{'(statement)*'}' #Stmt
+    | 'if' '(' expression ')' statement 'else' statement #IfElseStmt
+    | 'while' '(' expression ')' statement #WhileStmt
+    | expression ';' #ExprStmt
+    | ID '=' expression ';' #Assignment
+    | ID '[' expression ']' '=' expression ';' #Assignment;
 
 expression
-    : expression ('*' | '/') expression
-    | expression ('+' | '-') expression
-    | expression '<' expression
-    | expression '&&' expression
-    | expression '[' expression ']'
-    | expression'.''length'
-    | expression'.'ID'('(expression(','expression)*)?')'
-    | 'new' 'int' '['expression']'
-    | 'new' ID'('')'
-    | '!'expression
-    | '('expression')'
-    | INTEGER
-    | 'true'
-    | 'false'
-    | ID
-    | 'this';
+    : '('expression')' #Parenthesis
+    | expression '[' expression ']' #Indexing
+    | expression'.'op='length' #Method
+    | expression'.'name=ID'('(expression(','expression)*)?')' #Method
+    | op='!'expression #UnaryOp
+    | expression op=('*' | '/') expression #BinaryOp
+    | expression op=('+' | '-') expression #BinaryOp
+    | expression op='<' expression #BinaryOp
+    | expression op='&&' expression #BinaryOp
+    | 'new' 'int' '['expression']' #Instantiation
+    | 'new' ID'('')' #Instantiation
+    | value=INTEGER #Integer
+    | value='true' #Boolean
+    | value='false' #Boolean
+    | value=ID #Identifier
+    | value='this' #This;
 

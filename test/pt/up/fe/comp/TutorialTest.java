@@ -25,7 +25,7 @@ public class TutorialTest {
 
     @Test
     public void testExprMult() {
-        TestUtils.parseVerbose("2 * 3", EXPRESSION);
+        TestUtils.parseVerbose("!a + b", EXPRESSION);
     }
 
     @Test
