@@ -13,7 +13,7 @@ program
     : (importDeclaration)* classDeclaration EOF;
 
 importDeclaration
-    : ('import' ID ('.'ID)* ';') #Import;
+    : ('import' name=ID ('.'ID)* ';') #Import;
 
 classDeclaration
     : 'class' name=ID ('extends' extendsName=ID)? '{'(varDeclaration)* (methodDeclaration)*'}' #Class;
@@ -23,36 +23,36 @@ varDeclaration
 
 methodDeclaration
     : ('public')? type value=ID '(' (type value=ID (',' type value=ID)*)? ')' '{' (varDeclaration)*
-    (statement)* 'return' expression ';' '}'
-    | ('public')? 'static' 'void' 'main' '(' 'String' '['']' ID ')' '{' (varDeclaration)* (statement)* '}';
+    (statement)* 'return' expression ';' '}' #Method
+    | ('public')? 'static' 'void' 'main' '(' 'String' '['']' ID ')' '{' (varDeclaration)* (statement)* '}'#Method;
 
 type
     : 'int' '['']' #ArrayType
     | 'boolean' #BooleanType
     | 'int' #IntegerType
     | 'String' #StringType
-    | ID #IdentifierType;
+    | name=ID #IdentifierType;
 
 statement
     : '{'(statement)*'}' #Stmt
     | 'if' '(' expression ')' statement 'else' statement #IfElseStmt
     | 'while' '(' expression ')' statement #WhileStmt
     | expression ';' #ExprStmt
-    | ID '=' expression ';' #Assignment
-    | ID '[' expression ']' '=' expression ';' #Assignment;
+    | var=ID '=' expression ';' #Assignment
+    | var=ID '[' expression ']' '=' expression ';' #Assignment;
 
 expression
     : '('expression')' #Parenthesis
     | expression '[' expression ']' #Indexing
-    | expression'.'op='length' #Method
-    | expression'.'name=ID'('(expression(','expression)*)?')' #Method
+    | expression'.'op='length' #Length
+    | expression'.'name=ID'('(expression(','expression)*)?')' #MethodCall
     | op='!'expression #UnaryOp
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op='<' expression #BinaryOp
     | expression op='&&' expression #BinaryOp
     | 'new' 'int' '['expression']' #Instantiation
-    | 'new' ID'('')' #Instantiation
+    | 'new' name=ID'('')' #Instantiation
     | value=INTEGER #Integer
     | value='true' #Boolean
     | value='false' #Boolean
