@@ -41,11 +41,43 @@ public class Launcher {
 
         TestUtils.noErrors(parserResult.getReports());
 
-        JavaCalcGenerator gen = new JavaCalcGenerator ();
-        String generatedCode = gen.visit(parserResult.getRootNode(),"");
-        System.out.println ( generatedCode );
+        MySymbolTable symbolTable = new MySymbolTable();
 
+        ClassVisitor classVisitor = new ClassVisitor ();
+        classVisitor.visit(parserResult.getRootNode());
+        symbolTable.setClassName(classVisitor.getClassName());
+        symbolTable.setSuper(classVisitor.getSuperClassName());
 
+        System.out.println(symbolTable.getClassName());
+        System.out.println(symbolTable.getSuper());
+
+        ImportVisitor importVisitor = new ImportVisitor();
+        importVisitor.visit(parserResult.getRootNode());
+        symbolTable.setImports(importVisitor.getImports());
+
+        System.out.println(symbolTable.getImports());
+
+        MethodVisitor methodVisitor = new MethodVisitor();
+        methodVisitor.visit(parserResult.getRootNode());
+        symbolTable.setClassMethods(methodVisitor.getClassMethods());
+        symbolTable.setMethodParams(methodVisitor.getMethodsParams());
+        symbolTable.setMethodReturnTypes(methodVisitor.getMethodsReturns());
+        symbolTable.setLocalVariables(methodVisitor.getLocalVariables());
+
+        System.out.println(symbolTable.getMethods());
+        System.out.println("-----------------------");
+        for (String method: symbolTable.getMethods()){
+            System.out.println(symbolTable.getParameters(method));
+            System.out.println("--//--");
+            System.out.println(symbolTable.getReturnType(method));
+        }
+        System.out.println("-----------------------");
+
+        FieldVisitor fieldVisitor = new FieldVisitor();
+        fieldVisitor.visit(parserResult.getRootNode());
+        symbolTable.setClassFields(fieldVisitor.getClassFields());
+
+        System.out.println(symbolTable.getFields());
 
         // ... add remaining stages
     }

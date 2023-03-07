@@ -8,30 +8,31 @@ INTEGER : [0-9]+ ;
 ID : [a-zA-Z_][a-zA-Z_0-9]* ;
 
 WS : [ \t\n\r\f]+ -> skip ;
+COMMENT : ('/*' .*? '*/'| '//' ~[\r\n]*) -> skip;
 
 program
     : (importDeclaration)* classDeclaration EOF;
 
 importDeclaration
-    : ('import' name=ID ('.'ID)* ';') #Import;
+    : ('import' name=ID ('.'values+=ID)* ';') #Import;
 
 classDeclaration
     : 'class' name=ID ('extends' extendsName=ID)? '{'(varDeclaration)* (methodDeclaration)*'}' #Class;
 
 varDeclaration
-    : type value=ID';' #Declaration;
+    : ('public')? ('private')? type value=ID';' #Declaration;
 
 methodDeclaration
-    : ('public')? type value=ID '(' (type value=ID (',' type value=ID)*)? ')' '{' (varDeclaration)*
+    : ('public')? type methodName=ID '(' (type paramName=ID (',' type otherParams+=ID)*)? ')' '{' (varDeclaration)*
     (statement)* 'return' expression ';' '}' #Method
-    | ('public')? 'static' 'void' 'main' '(' 'String' '['']' ID ')' '{' (varDeclaration)* (statement)* '}'#Method;
+    | ('public')? 'static' 'void' 'main' '(' 'String' '['']' args=ID ')' '{' (varDeclaration)* (statement)* '}'#Method;
 
-type
-    : 'int' '['']' #ArrayType
-    | 'boolean' #BooleanType
-    | 'int' #IntegerType
-    | 'String' #StringType
-    | name=ID #IdentifierType;
+type locals [boolean isArray = false]
+    : name='int' ('['']'{$isArray = true;})?
+    | name='boolean'
+    | name='int'
+    | name='String'
+    | name=ID;
 
 statement
     : '{'(statement)*'}' #Stmt

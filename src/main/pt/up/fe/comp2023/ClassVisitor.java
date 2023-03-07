@@ -5,34 +5,50 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
-public class JavaCalcGenerator extends AJmmVisitor<String,String> {
+public class ClassVisitor extends AJmmVisitor<Void,Void> {
     private String className;
+    private String superClassName;
     private Map<String,Integer> reads = new HashMap<>();
     private Map<String,Integer> writes = new HashMap<>();
 
-    public JavaCalcGenerator() {
-
-    }
-
     protected void buildVisitor() {
-        addVisit ("Program", this :: dealWithProgram );
-        addVisit ("Assignment", this :: dealWithAssignment );
+        addVisit ("Program", this::dealWithProgram);
+        addVisit("Class", this::dealWithClass);
+/*        addVisit ("Assignment", this :: dealWithAssignment );
         addVisit ("Integer", this :: dealWithLiteral );
         addVisit ("Identifier", this :: dealWithLiteral );
         addVisit("BinaryOp", this::dealWithBinaryOp);
         addVisit("ExprStmt", this::dealWithExprStmt);
-        addVisit("Parenthesis", this::dealWithParenthesis);
+        addVisit("Parenthesis", this::dealWithParenthesis);*/
     }
 
-    private String dealWithProgram( JmmNode jmmNode , String s) {
-        s = (s!= null ?s:"");
-        String ret = s+" public class "+ "test" +" {\n";
-
-        return ret;
+    public String getClassName() {
+        return className;
     }
 
-    private String dealWithAssignment(JmmNode jmmNode, String s) {
+    public String getSuperClassName() {
+        return superClassName;
+    }
+    private Void dealWithProgram(JmmNode jmmNode, Void v) {
+        for(JmmNode child: jmmNode.getChildren()){
+            if(Objects.equals(child.getKind(), "Class")) {
+                visit(child, null);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    private Void dealWithClass (JmmNode jmmNode, Void v) {
+        className = jmmNode.get("name");
+        superClassName = jmmNode.get("extendsName");
+
+        return null;
+    }
+
+/*    private S dealWithAssignment(JmmNode jmmNode, String s) {
         JmmNode expression = jmmNode.getChildren().get(0);
         writes.merge(jmmNode.get("var"),1,Integer::sum);
         String initialPart = s + "int " + jmmNode.get("var") + " = ";
@@ -89,5 +105,5 @@ public class JavaCalcGenerator extends AJmmVisitor<String,String> {
         res += ')';
 
         return res;
-    }
+    }*/
 }

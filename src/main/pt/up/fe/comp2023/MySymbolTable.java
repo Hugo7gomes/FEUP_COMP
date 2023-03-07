@@ -35,6 +35,10 @@ public class MySymbolTable implements SymbolTable {
         this.imports = imports;
     }
 
+    public void setClassFields(List<Symbol> fields) {
+        this.classFields = fields;
+    }
+
     public void addMethod(String methodName, List<Symbol> params, Type returnType) {
         methodParams.put(methodName, params);
         methodReturnTypes.put(methodName, returnType);
@@ -71,6 +75,18 @@ public class MySymbolTable implements SymbolTable {
     @Override
     public List<String> getMethods() {
         return classMethods;
+    }
+
+    public void setMethodParams(Map<String, List<Symbol>> methodParams) {
+        this.methodParams = methodParams;
+    }
+
+    public void setMethodReturnTypes(Map<String, Type> methodReturnTypes) {
+        this.methodReturnTypes = methodReturnTypes;
+    }
+
+    public void setLocalVariables(Map<String, List<Symbol>> localVariables) {
+        this.localVariables = localVariables;
     }
 
     @Override
