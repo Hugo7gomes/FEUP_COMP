@@ -23,9 +23,9 @@ varDeclaration
     : ('public')? ('private')? type value=ID';' #Declaration;
 
 methodDeclaration
-    : ('public')? type methodName=ID '(' (type paramName=ID (',' type otherParams+=ID)*)? ')' '{' (varDeclaration)*
+    : ('public')? type methodName=ID '(' (type params+=ID (',' type params+=ID)*)? ')' '{' (varDeclaration)*
     (statement)* 'return' expression ';' '}' #Method
-    | ('public')? 'static' 'void' 'main' '(' 'String' '['']' args=ID ')' '{' (varDeclaration)* (statement)* '}'#Method;
+    | ('public')? 'static' 'void' methodName='main' '(' 'String' '['']' args=ID ')' '{' (varDeclaration)* (statement)* '}'#Method;
 
 type locals [boolean isArray = false]
     : name='int' ('['']'{$isArray = true;})?

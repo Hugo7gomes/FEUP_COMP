@@ -54,7 +54,7 @@ public class SimpleParser implements JmmParser {
 
             if(parser.getNumberOfSyntaxErrors() > 0){
                 return JmmParserResult.newError(new Report(ReportType.WARNING, Stage.SYNTATIC, -1,
-                        "There were syntax errors during parsing, terminating"));
+                        "There were " + parser.getNumberOfSyntaxErrors() + " syntax errors during parsing, terminating"));
             }
             // Convert ANTLR CST to JmmNode AST
             return AntlrParser.parse(lex, parser, startingRule)
@@ -62,7 +62,7 @@ public class SimpleParser implements JmmParser {
                     .map(root -> new JmmParserResult(root, Collections.emptyList(), config))
                     // If there were errors, create an error JmmParserResult without root node
                     .orElseGet(() -> JmmParserResult.newError(new Report(ReportType.WARNING, Stage.SYNTATIC, -1,
-                            "There were syntax errors during parsing, terminating")));
+                            "There were " + parser.getNumberOfSyntaxErrors() + " syntax errors during parsing, terminating")));
 
         } catch (Exception e) {
             // There was an uncaught exception during parsing, create an error JmmParserResult without root node

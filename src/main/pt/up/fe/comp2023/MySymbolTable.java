@@ -103,4 +103,54 @@ public class MySymbolTable implements SymbolTable {
     public List<Symbol> getLocalVariables(String s) {
         return localVariables.get(s);
     }
+
+    public String print(){
+        StringBuilder res = new StringBuilder();
+        res.append("Class - ").append(className).append("\n");
+        res.append("Super - ").append(superClassName).append("\n");
+        res.append("\n=======================\n\n");
+        res.append("Imports - ").append(imports).append("\n");
+        res.append("\n=======================\n\n");
+        res.append("Fields - ").append("\n");
+        for(Symbol field: classFields){
+            res.append("\t").append(field.getType().getName());
+            if(field.getType().isArray()){
+                res.append("[]");
+            }
+            res.append(" ").append(field.getName()).append("\n");
+        }
+        res.append("\n=======================\n\n");
+        for (String method:classMethods){
+            res.append("Method - ").append(method).append("\n");
+            res.append("\tParams - \n");
+            checkEmpty(res, method, methodParams);
+            res.append("\tReturn - \n");
+            if(methodReturnTypes.get(method).isArray()){
+                res.append("\t\t").append(methodReturnTypes.get(method).getName()).append("[]\n");
+            }
+            else{
+                res.append("\t\t").append(methodReturnTypes.get(method).getName()).append("\n");
+            }
+
+            res.append("\tLocal Variables - \n");
+            checkEmpty(res, method, localVariables);
+            res.append("\n-----------------------\n\n");
+
+        }
+        res.append("\n");
+        return res.toString();
+    }
+
+    private void checkEmpty(StringBuilder res, String method, Map<String, List<Symbol>> list) {
+        if(list.isEmpty()){
+            res.append("\t\tNone\n");
+        }
+        for (Symbol localVariable: list.get(method)){
+            res.append("\t\t").append(localVariable.getType().getName());
+            if(localVariable.getType().isArray()){
+                res.append("[]");
+            }
+            res.append(" ").append(localVariable.getName()).append("\n");
+        }
+    }
 }
