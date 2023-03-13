@@ -80,7 +80,8 @@ public class MethodVisitor extends AJmmVisitor<Void,Void> {
 
         if (methodName.equals("main")) {
             Type paramsType = new Type("String", true);
-            Symbol paramsSymbol = new Symbol(paramsType, "args");
+            String paramName = jmmNode.get("args");
+            Symbol paramsSymbol = new Symbol(paramsType, paramName);
             methodParams.add(paramsSymbol);
             Type returnType = new Type("void", false);
             methodsReturns.put(methodName, returnType);
