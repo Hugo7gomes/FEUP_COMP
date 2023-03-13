@@ -92,6 +92,10 @@ public class Launcher {
         config.put("registerAllocation", "-1");
         config.put("debug", "false");
 
+        // parseArgs
+
+
+
         return config;
     }
 

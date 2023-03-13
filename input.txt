@@ -1,4 +1,4 @@
-import io;
+import java.io;
 class MethodsAndFields{
 	int field1;
 	boolean field2;
