@@ -109,7 +109,10 @@ public class MySymbolTable implements SymbolTable {
         res.append("Class - ").append(className).append("\n");
         res.append("Super - ").append(superClassName).append("\n");
         res.append("\n=======================\n\n");
-        res.append("Imports - ").append(imports).append("\n");
+        res.append("Imports - ").append("\n");
+        for (String imp: imports) {
+            res.append("\t").append(imp).append("\n");
+        }
         res.append("\n=======================\n\n");
         res.append("Fields - ").append("\n");
         for(Symbol field: classFields){

@@ -47,7 +47,7 @@ expression
     | expression '[' expression ']' #Indexing
     | expression'.'op='length' #Length
     | expression'.'name=ID'('(expression(','expression)*)?')' #MethodCall
-    | op='!'expression #UnaryOp
+    | op='!'expression #Not
     | expression op=('*' | '/') expression #BinaryOp
     | expression op=('+' | '-') expression #BinaryOp
     | expression op='<' expression #BinaryOp

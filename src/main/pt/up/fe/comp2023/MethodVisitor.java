@@ -99,6 +99,7 @@ public class MethodVisitor extends AJmmVisitor<Void,Void> {
             Type type = new Type(returnTypeName, returnIsArray);
 
             methodsReturns.put(methodName, type);
+
             for (int i = 1; i < children.size(); i++) {
                 if (children.get(i).getKind().equals("Declaration")) {
                     JmmNode declaration = children.get(i);
