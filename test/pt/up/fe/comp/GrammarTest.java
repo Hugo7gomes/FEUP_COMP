@@ -212,9 +212,8 @@ public class GrammarTest {
 
     @Test
     public void testExprAddChain() {
-        TestUtils.parseVerbose("1 + 2 - 3 + 4", EXPRESSION);
+        TestUtils.parseVerbose("1 + 2 - (-3) + 4", EXPRESSION);
     }
-
     @Test
     public void testExprRelational() {
         TestUtils.parseVerbose("1 < 2", EXPRESSION);

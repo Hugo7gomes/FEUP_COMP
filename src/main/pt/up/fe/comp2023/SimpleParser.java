@@ -51,7 +51,7 @@ public class SimpleParser implements JmmParser {
             var tokens = new CommonTokenStream(lex);
             // Transforms tokens into a parse tree
             var parser = new pt.up.fe.comp2023.JavammParser(tokens);
-            
+
             // Convert ANTLR CST to JmmNode AST
             return AntlrParser.parse(lex, parser, startingRule)
                     // If there were no errors and a root node was generated, create a JmmParserResult with the node
