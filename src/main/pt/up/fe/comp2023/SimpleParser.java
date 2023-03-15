@@ -53,7 +53,7 @@ public class SimpleParser implements JmmParser {
             var parser = new pt.up.fe.comp2023.JavammParser(tokens);
 
             if(parser.getNumberOfSyntaxErrors() > 0){
-                return JmmParserResult.newError(new Report(ReportType.WARNING, Stage.SYNTATIC, -1,
+                return JmmParserResult.newError(new Report(ReportType.ERROR, Stage.LEXICAL, -1,
                         "There were " + parser.getNumberOfSyntaxErrors() + " syntax errors during parsing, terminating"));
             }
             // Convert ANTLR CST to JmmNode AST
@@ -66,7 +66,7 @@ public class SimpleParser implements JmmParser {
 
         } catch (Exception e) {
             // There was an uncaught exception during parsing, create an error JmmParserResult without root node
-            return JmmParserResult.newError(Report.newError(Stage.SYNTATIC, -1, -1, "Exception during parsing", e));
+            return JmmParserResult.newError(Report.newError(Stage.LEXICAL, -1, -1, "Exception during parsing", e));
         }
     }
 }
