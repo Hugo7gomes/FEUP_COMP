@@ -5,6 +5,7 @@ import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor ;
 import pt.up.fe.comp.jmm.ast.JmmNode ;
+import pt.up.fe.comp.jmm.parser.JmmParserResult;
 
 import java.util.*;
 
@@ -155,5 +156,27 @@ public class MySymbolTable implements SymbolTable {
             }
             res.append(" ").append(localVariable.getName()).append("\n");
         }
+    }
+
+    public void create(JmmParserResult jmmParserResult){
+        ClassVisitor classVisitor = new ClassVisitor ();
+        classVisitor.visit(jmmParserResult.getRootNode());
+        this.setClassName(classVisitor.getClassName());
+        this.setSuper(classVisitor.getSuperClassName());
+
+        ImportVisitor importVisitor = new ImportVisitor();
+        importVisitor.visit(jmmParserResult.getRootNode());
+        this.setImports(importVisitor.getImports());
+
+        MethodVisitor methodVisitor = new MethodVisitor();
+        methodVisitor.visit(jmmParserResult.getRootNode());
+        this.setClassMethods(methodVisitor.getClassMethods());
+        this.setMethodParams(methodVisitor.getMethodsParams());
+        this.setMethodReturnTypes(methodVisitor.getMethodsReturns());
+        this.setLocalVariables(methodVisitor.getLocalVariables());
+
+        FieldVisitor fieldVisitor = new FieldVisitor();
+        fieldVisitor.visit(jmmParserResult.getRootNode());
+        this.setClassFields(fieldVisitor.getClassFields());
     }
 }
