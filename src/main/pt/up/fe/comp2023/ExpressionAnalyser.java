@@ -35,6 +35,73 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
         addVisit("Length", this::dealWithLengthMethod);
         addVisit("Indexing", this::dealWithArrayIndexing);
         addVisit("Parenthesis", this::dealWithParenthesis);
+        addVisit("UnaryOp", this::dealWithUnaryOp);
+        addVisit("NewIntArray", this::dealWithNewIntArray);
+        addVisit("NewObject", this::dealWithNewObject);
+        addVisit("MethodCall", this::dealWithMethodCall);
+
+    }
+
+    private Type dealWithMethodCall(JmmNode jmmNode, String s) {
+        String methodName = jmmNode.get("name");
+        JmmNode classCall = jmmNode.getJmmChild(0);
+        Type classType = visit(classCall,"");
+
+        //The class calling the method is the current class
+        if(classType.getName().equals(symbolTable.getClassName())){
+            //verify if method exist
+            if(symbolTable.getMethods().contains(methodName)){
+                //verify arguments type
+                List<Symbol> methodParams = symbolTable.getParameters(methodName);
+                for (int i = 1; i < jmmNode.getNumChildren(); i++){
+                    Type argType = visit(jmmNode.getJmmChild(i),"");
+                    // (i-1) because parameters index start at 0 and children that corresponds to arguments start at 1
+                    if(!methodParams.get(i - 1).getType().equals(argType)){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Error in argument"+ jmmNode.getJmmChild(i).get("name") + "type" ));
+                        return new Type("error", false);
+                    }
+                }
+            }//checks if current class extends a super class
+            else if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Method doesnt exist"));
+                return new Type("error", false);
+            }
+        }else{
+            //checks if class is imported assume method is being called correctly
+            if(!symbolTable.getImports().contains(classType.getName())){
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Class not imported"));
+                return new Type("error", false);
+            }
+        }
+        return symbolTable.getReturnType(methodName);
+
+    }
+
+    private Type dealWithNewObject(JmmNode jmmNode, String s) {
+        return new Type(jmmNode.get("name"),false);
+    }
+
+    private Type dealWithNewIntArray(JmmNode jmmNode, String s) {
+        JmmNode child =jmmNode.getJmmChild(0);
+        Type childType = visit(child,"");
+
+        if(!childType.getName().equals("int")){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Array initialization requires integer size"));
+        }
+        return  new Type("int", true);
+    }
+
+    private Type dealWithUnaryOp(JmmNode jmmNode, String s) {
+        JmmNode child =jmmNode.getJmmChild(0);
+        Type childType = visit(child,"");
+
+        //Checks if child type is boolean
+        if(!childType.getName().equals("boolean")){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Only boolean type can be used with not operator"));
+            //return new Type("error", false);
+        }
+
+        return new Type("boolean",false);
 
     }
 
