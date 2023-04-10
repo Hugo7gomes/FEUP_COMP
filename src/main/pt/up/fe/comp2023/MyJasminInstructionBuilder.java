@@ -15,15 +15,6 @@ public class MyJasminInstructionBuilder {
         this.method = method;
     }
 
-    private String getInstruction(String instruction, String... args) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(instruction);
-        for (String arg : args) {
-            stringBuilder.append(" ").append(arg);
-        }
-        return stringBuilder.toString();
-    }
-
     public static String buildInstruction(Instruction instruction){
         InstructionType inst = instruction.getInstType();
         String ret = "";
@@ -219,12 +210,7 @@ public class MyJasminInstructionBuilder {
 
         if(opType == OperationType.LTH){
             stringBuilder.append(leftOperandString);
-        }
-        else if (opType == OperationType.AND) {
-            stringBuilder.append(leftOperandString);
-            stringBuilder.append(rightOperandString);
-        }
-        else {
+        } else {
             stringBuilder.append(leftOperandString);
             stringBuilder.append(rightOperandString);
             stringBuilder.append(MyJasminInstruction.arithOp(opType));
@@ -256,7 +242,7 @@ public class MyJasminInstructionBuilder {
         OperationType opType = condition.getOperation().getOpType();
 
         if(opType == OperationType.LTH){
-            String compare = "";
+            String compare;
             stringBuilder.append(loadOp(leftOperand));
             if(rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0")){
                 compare = MyJasminInstruction.iflt(label);

@@ -25,10 +25,6 @@ public class MyJasminInstruction {
         return "dup\n";
     }
 
-    public static String swap() {
-        return "swap\n";
-    }
-
     public static String iload(int register) {
         return registerInstruction("iload", register);
     }
@@ -84,10 +80,6 @@ public class MyJasminInstruction {
         return "goto " + label + "\n";
     }
 
-    public static String ifeq(String label) {
-        return "ifeq " + label + "\n";
-    }
-
     public static String ifne(String label) {
         return "ifne " + label + "\n";
     }
@@ -100,40 +92,8 @@ public class MyJasminInstruction {
         return "iflt " + label + "\n";
     }
 
-    public static String ifle(String label) {
-        return "ifle " + label + "\n";
-    }
-
-    public static String ifgt(String label) {
-        return "ifgt " + label + "\n";
-    }
-
-    public static String ifge(String label) {
-        return "ifge " + label + "\n";
-    }
-
-    public static String if_icmpeq(String label) {
-        return "if_icmpeq " + label + "\n";
-    }
-
-    public static String if_icmpne(String label) {
-        return "if_icmpne " + label + "\n";
-    }
-
     public static String if_icmplt(String label) {
         return "if_icmplt " + label + "\n";
-    }
-
-    public static String if_icmple(String label) {
-        return "if_icmple " + label + "\n";
-    }
-
-    public static String if_icmpgt(String label) {
-        return "if_icmpgt " + label + "\n";
-    }
-
-    public static String if_icmpge(String label) {
-        return "if_icmpge " + label + "\n";
     }
 
     public static String arithOp(OperationType op) {
@@ -167,10 +127,6 @@ public class MyJasminInstruction {
             }
         }
         return "";
-    }
-
-    public static String returnOp() {
-        return "ireturn\n";
     }
 
     public static String fieldOp(FieldInstructionType type, String className, String fieldName, String fieldType) {
