@@ -19,6 +19,7 @@ public class MyJasminUtils {
             case STRING -> typeBuilder.append("Ljava/lang/String;");
             case VOID -> typeBuilder.append("V");
             case OBJECTREF -> {
+                assert type instanceof ClassType;
                 String className = ((ClassType) type).getName();
                 typeBuilder.append("L").append(getClassName(context, className)).append(";");
             }

@@ -1,19 +1,19 @@
 package pt.up.fe.comp2023;
 
-import org.specs.comp.ollir.AccessModifiers;
-import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.Field;
-import org.specs.comp.ollir.Method;
+import org.specs.comp.ollir.*;
+
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class ConvertOllirToJasmin {
 
-    private ClassUnit classUnit;
+    private final ClassUnit classUnit;
 
     public ConvertOllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
     }
+
     public String toJasmin() {
-        this.classUnit.buildVarTables();
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -39,10 +39,12 @@ public class ConvertOllirToJasmin {
         stringBuilder.append("\n\n\n");
 
         for(Method method: this.classUnit.getMethods()){
-            stringBuilder.append(buildMethod(method));
+            stringBuilder.append(buildMethodHeader(method));
+            stringBuilder.append(buildMethodStatements(method));
+            stringBuilder.append(".end method\n");
         }
 
-        return null;
+        return stringBuilder.toString();
     }
 
     public String buildField(Field field){
@@ -73,7 +75,7 @@ public class ConvertOllirToJasmin {
         return stringBuilder.toString();
     }
 
-    public String buildMethod(Method method, LabelTracker labelTracker){
+    public String buildMethodHeader(Method method){
         StringBuilder stringBuilder = new StringBuilder();
         AccessModifiers accessModifier = method.getMethodAccessModifier();
         StringBuilder access = new StringBuilder();
@@ -81,26 +83,51 @@ public class ConvertOllirToJasmin {
         if(accessModifier != AccessModifiers.DEFAULT){
             access.append(accessModifier.name().toLowerCase()).append(" ");
         }
+        if (method.isStaticMethod()) {
+            access.append("static ");
+        }
+        if (method.isFinalMethod()) {
+            access.append("final ");
+        }
+
         stringBuilder.append(".method " ).append(access);
         if (method.isStaticMethod()) {
             access.append("static ");
         }
+        stringBuilder.append(method.getMethodName()).append("(");
 
-        stringBuilder.append(method.getMethodName()).append(" ");
+        String params = method.getParams().stream()
+                .map(param -> MyJasminUtils.getType(this.classUnit, param.getType()))
+                .collect(Collectors.joining());
 
-        
-
-        stringBuilder.append(MyJasminUtils.getType(this.classUnit, method.getReturnType()));
-
-        stringBuilder.append("\n");
-        stringBuilder.append(".limit stack 100\n");
-        stringBuilder.append(".limit locals 100\n");
-
-        stringBuilder.append("\n\n\n");
-
-        stringBuilder.append(".end method\n");
+        stringBuilder.append(params).append(")").append(MyJasminUtils.getType(this.classUnit, method.getReturnType())).append("\n");
 
         return stringBuilder.toString();
     }
 
+    public String buildMethodStatements(Method method){
+        StringBuilder stringBuilder = new StringBuilder();
+        MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method);
+
+        HashMap<String, Instruction> labels = method.getLabels();
+
+        for (Instruction instruction: method.getInstructions()) {
+            for(String label: labels.keySet()){
+                if(labels.get(label) == instruction){
+                    stringBuilder.append(label).append(":\n");
+                }
+            }
+
+            stringBuilder.append(MyJasminInstructionBuilder.buildInstruction(instruction));
+
+            if (instruction.getInstType() == InstructionType.CALL) {
+                ElementType returnType = ((CallInstruction) instruction).getReturnType().getTypeOfElement();
+                CallType callType = ((CallInstruction) instruction).getInvocationType();
+                if (returnType != ElementType.VOID || callType == CallType.invokespecial) {
+                    stringBuilder.append(MyJasminInstruction.pop());
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
 }
