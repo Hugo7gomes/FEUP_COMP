@@ -104,26 +104,17 @@ public class MyJasminInstruction {
             case SUB -> {
                 return "isub\n";
             }
-            case MUL, ANDB -> {
+            case MUL -> {
                 return "imul\n";
             }
             case DIV -> {
                 return "idiv\n";
             }
-            case AND -> {
+            case ANDB -> {
                 return "iand\n";
             }
             case OR -> {
                 return "ior\n";
-            }
-            case XOR -> {
-                return "ixor\n";
-            }
-            case SHL -> {
-                return "ishl\n";
-            }
-            case SHR -> {
-                return "ishr\n";
             }
         }
         return "";

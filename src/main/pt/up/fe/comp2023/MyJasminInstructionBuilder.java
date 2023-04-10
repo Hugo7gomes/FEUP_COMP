@@ -9,13 +9,13 @@ import java.util.Objects;
 import static java.lang.Integer.parseInt;
 
 public class MyJasminInstructionBuilder {
-    private static Method method;
+    private Method method;
 
     public MyJasminInstructionBuilder(Method method) {
         this.method = method;
     }
 
-    public static String buildInstruction(Instruction instruction){
+    public String buildInstruction(Instruction instruction){
         InstructionType inst = instruction.getInstType();
         String ret = "";
         switch (inst) {
@@ -33,11 +33,11 @@ public class MyJasminInstructionBuilder {
         return ret;
     }
 
-    private static Descriptor lookup(Element element){
+    private Descriptor lookup(Element element){
         return method.getVarTable().get(((Operand) element).getName());
     }
 
-    private static String argTypes(ArrayList<Element> args){
+    private String argTypes(ArrayList<Element> args){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("(");
         for(Element arg: args){
@@ -46,18 +46,18 @@ public class MyJasminInstructionBuilder {
         stringBuilder.append(")");
         return stringBuilder.toString();
     }
-    private static int register(Element element){
+    private int register(Element element){
         return lookup(element).getVirtualReg();
     }
 
-    private static String getArray(Element element){
+    private String getArray(Element element){
         int arrayReg = register(element);
         Element index = ((ArrayOperand) element).getIndexOperands().get(0);
         int indexReg = register(index);
         return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(indexReg);
     }
 
-    private static String loadOp(Element element) {
+    private String loadOp(Element element) {
         ElementType type = element.getType().getTypeOfElement();
 
         if(element.isLiteral()) {
@@ -81,7 +81,7 @@ public class MyJasminInstructionBuilder {
         throw new NotImplementedException(element);
     }
 
-    private static String storeOp(Element element, String value){
+    private String storeOp(Element element, String value){
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
@@ -101,7 +101,7 @@ public class MyJasminInstructionBuilder {
         throw new NotImplementedException(element);
     }
 
-    private static String buildReturn(ReturnInstruction instruction){
+    private String buildReturn(ReturnInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         if(!instruction.hasReturnValue()) return "return\n";
         Element resultValue = instruction.getOperand();
@@ -115,7 +115,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
 
     }
-    private static String buildAssign(AssignInstruction instruction){
+    private String buildAssign(AssignInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element lefthandMostSymbol = instruction.getDest();
         Instruction rightHandMostSymbol = instruction.getRhs();
@@ -150,7 +150,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String buildCall(CallInstruction instruction){
+    private String buildCall(CallInstruction instruction){
         switch (instruction.getInvocationType()) {
             case NEW -> {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -199,7 +199,7 @@ public class MyJasminInstructionBuilder {
         }
     }
 
-    private static String buildBinaryOp (BinaryOpInstruction instruction){
+    private String buildBinaryOp (BinaryOpInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element leftOperand = instruction.getLeftOperand();
         Element rightOperand = instruction.getRightOperand();
@@ -219,7 +219,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String buildUnaryOp(UnaryOpInstruction instruction){
+    private String buildUnaryOp(UnaryOpInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element operand = instruction.getOperand();
         OperationType opType = instruction.getOperation().getOpType();
@@ -231,11 +231,11 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String buildGoto(GotoInstruction instruction){
+    private String buildGoto(GotoInstruction instruction){
         return MyJasminInstruction.gotoLabel(instruction.getLabel());
     }
 
-    private static String ifBinaryConditionInstruction(BinaryOpInstruction condition, String label){
+    private String ifBinaryConditionInstruction(BinaryOpInstruction condition, String label){
         StringBuilder stringBuilder = new StringBuilder();
         Element leftOperand = condition.getLeftOperand();
         Element rightOperand = condition.getRightOperand();
@@ -259,11 +259,11 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String ifConditionInstruction(Instruction condition, String label){
+    private String ifConditionInstruction(Instruction condition, String label){
         return buildInstruction(condition) + MyJasminInstruction.ifne(label);
     }
 
-    private static String buildBranch(CondBranchInstruction instruction){
+    private String buildBranch(CondBranchInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Instruction condition = instruction.getCondition();
         String label = instruction.getLabel();
@@ -276,7 +276,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String fieldOp(Element fieldElem, Element classElem, InstructionType type){
+    private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
         MyJasminInstruction.FieldInstructionType fieldInstruction;
         if(type.equals(InstructionType.GETFIELD)){
             fieldInstruction = MyJasminInstruction.FieldInstructionType.GETFIELD;
@@ -290,7 +290,7 @@ public class MyJasminInstructionBuilder {
         return MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);
     }
 
-    private static String buildPutField(PutFieldInstruction instruction){
+    private String buildPutField(PutFieldInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element classElem = instruction.getFirstOperand();
         Element fieldElem = instruction.getSecondOperand();
@@ -301,7 +301,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String buildGetField(GetFieldInstruction instruction){
+    private String buildGetField(GetFieldInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element classElem = instruction.getFirstOperand();
         Element fieldElem = instruction.getSecondOperand();
@@ -310,7 +310,7 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private static String buildSingleOp(SingleOpInstruction instruction){
+    private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);
     }
