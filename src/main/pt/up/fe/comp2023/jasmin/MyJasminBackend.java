@@ -1,7 +1,6 @@
-package pt.up.fe.comp2023;
+package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.ClassUnit;
-import org.specs.comp.ollir.Ollir;
 import org.specs.comp.ollir.OllirErrorException;
 import pt.up.fe.comp.jmm.jasmin.JasminBackend;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;

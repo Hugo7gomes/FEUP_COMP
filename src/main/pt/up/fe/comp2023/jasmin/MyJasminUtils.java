@@ -1,4 +1,4 @@
-package pt.up.fe.comp2023;
+package pt.up.fe.comp2023.jasmin;
 
 import jdk.jshell.spi.ExecutionControl;
 import org.specs.comp.ollir.ElementType;
