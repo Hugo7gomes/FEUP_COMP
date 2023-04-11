@@ -3,14 +3,14 @@ package pt.up.fe.comp2023;
 import pt.up.fe.comp.TestUtils;
 import pt.up.fe.comp.jmm.analysis.JmmAnalysis;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
-import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.parser.JmmParserResult;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp2023.semantics.ExpressionAnalyser;
+import pt.up.fe.comp2023.semantics.ProgramAnalyser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class JmmAnalysisImpl implements JmmAnalysis {
@@ -30,8 +30,8 @@ public class JmmAnalysisImpl implements JmmAnalysis {
         MySymbolTable symbolTable = new MySymbolTable();
         symbolTable.create(jmmParserResult);
 
-        ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
-        expressionAnalyser.visit(node,null);
+        ProgramAnalyser programAnalyser = new ProgramAnalyser(symbolTable,reports);
+        programAnalyser.visit(node,null);
 
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
 

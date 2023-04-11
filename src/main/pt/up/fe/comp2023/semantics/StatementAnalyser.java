@@ -1,4 +1,4 @@
-package pt.up.fe.comp2023;
+package pt.up.fe.comp2023.semantics;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
@@ -7,6 +7,8 @@ import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
+import pt.up.fe.comp2023.MySymbolTable;
+import pt.up.fe.comp2023.semantics.ExpressionAnalyser;
 
 
 import java.util.List;
@@ -23,9 +25,22 @@ public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
 
     @Override
     protected void buildVisitor() {
+        addVisit("Stmt", this::dealWithStmt);
         addVisit("Assignment", this::dealWithAssignment);
         addVisit("IfElseStmt", this::dealConditionalStmt);
         addVisit("WhileStmt", this::dealConditionalStmt);
+        addVisit("ArrayAssignment", this::dealWithArrayAssignment);
+    }
+
+    private Type dealWithArrayAssignment(JmmNode jmmNode, String s) {
+        return null;
+    }
+
+    private Type dealWithStmt(JmmNode jmmNode, String s) {
+        for(JmmNode child: jmmNode.getChildren()){
+            visit(child);
+        }
+        return null;
     }
 
     //Deal with While and If conditional expression
@@ -85,12 +100,13 @@ public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
         //Get List of parameters of the method
         List<Symbol> parameters  = symbolTable.getParameters(parent.get("name"));
         //check if var is a parameter
-        for(Symbol p:locals){
+        for(Symbol p:parameters){
             if(p.getName().equals(var)){
                 varType = p.getType();
             }
         }
 
+        //Checks if assignee and assigner have different types
         if(!varType.getName().equals(childType.getName())){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Type of the assignee must be compatible with the assigned"));
             return new Type("error", false);
