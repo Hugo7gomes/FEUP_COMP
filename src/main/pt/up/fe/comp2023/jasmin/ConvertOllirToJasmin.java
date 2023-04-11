@@ -51,6 +51,7 @@ public class ConvertOllirToJasmin {
 
     public String buildField(Field field){
         StringBuilder stringBuilder = new StringBuilder();
+
         AccessModifiers accessModifier = field.getFieldAccessModifier();
         StringBuilder access = new StringBuilder();
 
@@ -109,6 +110,8 @@ public class ConvertOllirToJasmin {
 
     public String buildMethodStatements(Method method){
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(".limit stack 99\n");
+        stringBuilder.append(".limit locals 99\n");
         MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method);
 
         HashMap<String, Instruction> labels = method.getLabels();
@@ -130,6 +133,7 @@ public class ConvertOllirToJasmin {
                 }
             }
         }
+
         return stringBuilder.toString();
     }
 }

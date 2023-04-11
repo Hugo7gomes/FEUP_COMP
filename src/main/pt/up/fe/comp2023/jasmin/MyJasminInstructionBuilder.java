@@ -36,10 +36,11 @@ public class MyJasminInstructionBuilder {
 
     //method to get a variable in the method's var table
     private Descriptor lookup(Element element){
+        Descriptor aux = method.getVarTable().get(((Operand) element).getName());
         return method.getVarTable().get(((Operand) element).getName());
     }
 
-    //method to get arguments types in a method call
+    //method to get arguments types of a method
     private String argTypes(ArrayList<Element> args){
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("(");
@@ -187,10 +188,12 @@ public class MyJasminInstructionBuilder {
                 }
                 String className;
                 if(instruction.getInvocationType() != CallType.invokestatic){
-                    className = ((ClassType)instruction.getFirstArg().getType()).getName();
+                    ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                    className = classType.getName();
                 }
                 else {
-                    className = ((ClassType)instruction.getReturnType()).getName();
+                    ClassType classType = (ClassType) instruction.getReturnType();
+                    className = classType.getName();
                 }
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
@@ -303,6 +306,7 @@ public class MyJasminInstructionBuilder {
         Element valueElem = instruction.getThirdOperand();
         stringBuilder.append(loadOp(classElem));
         stringBuilder.append(loadOp(valueElem));
+        stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.PUTFIELD));
 
         return stringBuilder.toString();
     }
@@ -313,6 +317,7 @@ public class MyJasminInstructionBuilder {
         Element fieldElem = instruction.getSecondOperand();
         stringBuilder.append(loadOp(classElem));
         stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.GETFIELD));
+
         return stringBuilder.toString();
     }
 
