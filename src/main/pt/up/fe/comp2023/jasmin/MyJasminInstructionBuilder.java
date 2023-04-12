@@ -36,7 +36,6 @@ public class MyJasminInstructionBuilder {
 
     //method to get a variable in the method's var table
     private Descriptor lookup(Element element){
-        Descriptor aux = method.getVarTable().get(((Operand) element).getName());
         return method.getVarTable().get(((Operand) element).getName());
     }
 
