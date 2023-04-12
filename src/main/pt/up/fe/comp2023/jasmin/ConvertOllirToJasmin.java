@@ -110,8 +110,8 @@ public class ConvertOllirToJasmin {
 
     public String buildMethodStatements(Method method){
         StringBuilder stringBuilder = new StringBuilder();
-        //stringBuilder.append(".limit stack 99\n");
-        //stringBuilder.append(".limit locals 99\n");
+        stringBuilder.append(".limit stack 99\n");
+        stringBuilder.append(".limit locals 99\n");
         MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method);
 
         HashMap<String, Instruction> labels = method.getLabels();

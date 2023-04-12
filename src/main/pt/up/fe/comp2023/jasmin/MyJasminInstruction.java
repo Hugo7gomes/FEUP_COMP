@@ -50,11 +50,11 @@ public class MyJasminInstruction {
     }
 
     public static String iconst(int value) {
-        if(value >= 0 && value <= 5) {
-            return "iconst_" + value + "\n";
-        }
         if(value == -1) {
             return "iconst_m1\n";
+        }
+        if(value >= 0 && value <= 5) {
+            return "iconst_" + value + "\n";
         }
         if (value >= -128 && value <= 127) {
             return "bipush " + value + "\n";
