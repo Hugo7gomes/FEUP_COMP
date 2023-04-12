@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
+public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
     private MySymbolTable symbolTable;
     private List<Report> reports;
@@ -41,6 +41,7 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
         addVisit("NewObject", this::dealWithNewObject);
         addVisit("MethodCall", this::dealWithMethodCall);
 
+
     }
 
     private Type dealWithMethodCall(JmmNode jmmNode, String s) {
@@ -58,19 +59,19 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
                     Type argType = visit(jmmNode.getJmmChild(i),"");
                     // (i-1) because parameters index start at 0 and children that corresponds to arguments start at 1
                     if(!methodParams.get(i - 1).getType().equals(argType)){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Error in argument"+ jmmNode.getJmmChild(i).get("name") + "type" ));
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Error in argument type" ));
                         return new Type("error", false);
                     }
                 }
             }//checks if current class extends a super class
             else if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Method doesnt exist"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
                 return new Type("error", false);
             }
         }else{
             //checks if class is imported assume method is being called correctly
             if(!symbolTable.getImports().contains(classType.getName())){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Class not imported"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Class not imported"));
                 return new Type("error", false);
             }
         }
@@ -122,13 +123,13 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
 
         //Check if leftChild is not an array
         if(!leftType.isArray()){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Indexing error, " + leftChild.get("name") + " is not an array"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Indexing error, " + leftChild.get("value") + " is not an array"));
             return new Type("error", false);
         }
 
         //Check if type of index is not int
         if(rightType.getName() != "int"){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Indexing error,index is not int"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Indexing error,index is not int"));
             return new Type("error", false);
         }
 
@@ -163,59 +164,64 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
         String name = jmmNode.get("value");
         //Get parent
         JmmNode parent = jmmNode.getJmmParent();
-
-        //Get parent until find a methodDeclaration or ImportDeclaration
-        while (!parent.getKind().equals("methodDeclaration") && !parent.getKind().equals("importDeclaration")){
+        while(!parent.getKind().equals("Method")){
             parent = parent.getJmmParent();
         }
 
-        if(parent.getKind().equals("methodDeclaration")){
-            String methodName = parent.get("name");
+
+
+        if(parent.getKind().equals("Method")){
+            String methodName = parent.get("methodName");
+
 
             //Get local variables from method
-            List<Symbol> locals = symbolTable.getLocalVariables("methodName");
+            List<Symbol> locals = symbolTable.getLocalVariables(methodName);
             //Check if identifier is a local variables
-            for (Symbol l : locals){
-                if(l.getName() == name){
-                    return l.getType();
+            if(locals != null){
+                for (Symbol l : locals){
+                    if(l.getName().equals(name)){
+                        return l.getType();
+                    }
                 }
             }
 
             //Get params from method
-            List<Symbol> parameters  = symbolTable.getParameters("methodName");
+            List<Symbol> parameters  = symbolTable.getParameters(methodName);
             //Check if identifier is a parameter
-            for (Symbol p: parameters){
-                if(p.getName() == name){
-                    return p.getType();
+            if(parameters != null){
+                for (Symbol p: parameters){
+                    if(p.getName() == name){
+                        return p.getType();
+                    }
                 }
             }
 
             //Get fields from class
             List<Symbol> fields = symbolTable.getFields();
             //Check if identifier is a field
-            for(Symbol f:fields){
-                if(f.getName() == name){
-                    //Do I need to verify if the method is main? Fields cannot be used in main method?
-                    return  f.getType();
+            if(fields != null){
+                for(Symbol f:fields){
+                    if(f.getName() == name){
+                        //Do I need to verify if the method is main? Fields cannot be used in main method?
+                        return  f.getType();
+                    }
                 }
             }
+
 
             //No imports or Variable not in the imports.
             //Do I need to check superClassName ??
             if(symbolTable.getImports() == null || !symbolTable.getImports().contains(name)){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Variable " + name + " not declared"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Variable " + name + " not declared"));
             }
         }
         //Dummy return
-        return new Type("error", false);
+        return new Type("errorIdentifier", false);
     }
 
     private Type dealWithThis(JmmNode jmmNode, String s) {
         JmmNode parent = jmmNode.getJmmParent();
 
-        while(!parent.getKind().equals("methodDeclaration") && !parent.getKind().equals("importDeclaration")){
-            parent  = parent.getJmmParent();
-        }
 
         if(parent.getKind().equals("methodDeclaration")){
             if(parent.get("methodName") == "main"){
@@ -238,16 +244,16 @@ public class ExpressionAnalyser extends PreorderJmmVisitor<String, Type> {
 
         //Check different types
         if(leftType.getName() != rightType.getName()){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Operands have different types in " + op + "operation" ));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Operands have different types in " + op + "operation" ));
         }//check if left or right is an array
         else if(leftType.isArray() || rightType.isArray()) {
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Array cannot be used in " + op + "operation"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Array cannot be used in " + op + "operation"));
         }//check if leftType is not int in + - / * operations
         else  if (!leftType.getName().equals("int") && (op.equals("+") || op.equals("-") || op.equals("/") || op.equals("*") || op.equals("<"))){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Operation" + op + "cant support" + leftType.getName() + "type, expected integer"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Operation" + op + "cant support" + leftType.getName() + "type, expected integer"));
         }//check if leftType is not boolean in && operations
         else if(!leftType.getName().equals("boolean") && (op.equals("&&"))){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Operation" + op + "cant support" + leftType.getName() + "type, expected boolean"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Operation" + op + "cant support" + leftType.getName() + "type, expected boolean"));
         }else{
             switch (op) {
                 case "+", "-", "/", "*" -> {

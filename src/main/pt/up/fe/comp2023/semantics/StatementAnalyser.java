@@ -2,6 +2,7 @@ package pt.up.fe.comp2023.semantics;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
@@ -13,7 +14,7 @@ import pt.up.fe.comp2023.semantics.ExpressionAnalyser;
 
 import java.util.List;
 
-public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
+public class StatementAnalyser extends AJmmVisitor<String, Type> {
 
     private MySymbolTable symbolTable;
     private List<Report> reports;
@@ -30,6 +31,13 @@ public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
         addVisit("IfElseStmt", this::dealConditionalStmt);
         addVisit("WhileStmt", this::dealConditionalStmt);
         addVisit("ArrayAssignment", this::dealWithArrayAssignment);
+        addVisit("ExprStmt",this::dealWithExpression);
+    }
+
+    private Type dealWithExpression(JmmNode jmmNode, String s) {
+        ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
+        expressionAnalyser.visit(jmmNode.getJmmChild(0));
+        return null;
     }
 
     private Type dealWithArrayAssignment(JmmNode jmmNode, String s) {
@@ -53,7 +61,7 @@ public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
         Type childType = expressionAnalyser.visit(child, "");
         //Checks if type is not boolean
         if(!childType.getName().equals("boolean")){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Conditional expression needs to return a boolean" ));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Conditional expression needs to return a boolean" ));
             return new Type("error", false);
         }
         return childType;
@@ -72,44 +80,65 @@ public class StatementAnalyser extends PreorderJmmVisitor<String, Type> {
 
         Type varType = new Type("", false);
 
-        //Get fields
-        List<Symbol> fields = symbolTable.getFields();
-        //Check if var is a field
-        for(Symbol f: fields){
-            if(f.getName().equals(var)){
-                varType = f.getType();
-                break;
-            }
-        }
-
         JmmNode parent = jmmNode.getJmmParent();
-        while(!parent.getKind().equals("MethodDeclaration")){
+        while(!parent.getKind().equals("Method")){
             parent = parent.getJmmParent();
         }
 
+        String methodName = parent.get("methodName");
+
+
+        //Get fields
+        List<Symbol> fields = symbolTable.getFields();
+        //Check if var is a field
+        if(fields != null){
+            for(Symbol f: fields){
+                if(f.getName().equals(var)){
+                    varType = f.getType();
+                    break;
+                }
+            }
+        }
+
+
         //Get List of local variables
-        List<Symbol> locals = symbolTable.getLocalVariables(parent.get("name"));
+        List<Symbol> locals = symbolTable.getLocalVariables(methodName);
         //check if var is a local variable
-        for(Symbol l :locals){
-            if(l.getName().equals(var)){
-                varType = l.getType();
-                break;
+        if(locals != null){
+
+            for(Symbol l :locals){
+                if(l.getName().equals(var)){
+                    varType = l.getType();
+                    break;
+                }
             }
         }
 
         //Get List of parameters of the method
-        List<Symbol> parameters  = symbolTable.getParameters(parent.get("name"));
+        List<Symbol> parameters  = symbolTable.getParameters(methodName);
         //check if var is a parameter
-        for(Symbol p:parameters){
-            if(p.getName().equals(var)){
-                varType = p.getType();
+        if(parameters != null){
+            for(Symbol p:parameters){
+                if(p.getName().equals(var)){
+                    varType = p.getType();
+                }
             }
         }
 
+        System.out.println("VarName " + var + " Type " + varType);
+        System.out.println("ChildKind: " + child.getKind() + "//ChildType " + childType.getName());
+
+
+        //Checks if varType equals Super class and child type equals current class
+        if((varType.getName().equals(symbolTable.getSuper()) && childType.getName().equals(symbolTable.getClassName()))){
+            System.out.println("AQUIIIII");
+        }else if(symbolTable.getImports().contains(varType.getName()) && symbolTable.getImports().contains(childType.getName())){
+
+        }
         //Checks if assignee and assigner have different types
-        if(!varType.getName().equals(childType.getName())){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Type of the assignee must be compatible with the assigned"));
-            return new Type("error", false);
+        else if(!varType.getName().equals(childType.getName())){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Type of the assignee must be compatible with the assigned"));
+            return new Type("errorType", false);
         }
 
         return childType;

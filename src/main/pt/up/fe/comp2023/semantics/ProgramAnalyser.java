@@ -1,6 +1,7 @@
 package pt.up.fe.comp2023.semantics;
 
 import pt.up.fe.comp.jmm.analysis.table.Type;
+import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
@@ -9,7 +10,7 @@ import pt.up.fe.comp2023.MySymbolTable;
 import java.util.List;
 import java.util.Objects;
 
-public class ProgramAnalyser extends PreorderJmmVisitor<String, Type> {
+public class ProgramAnalyser extends AJmmVisitor<String, Type> {
 
     private MySymbolTable symbolTable;
     private List<Report> reports;
@@ -29,12 +30,13 @@ public class ProgramAnalyser extends PreorderJmmVisitor<String, Type> {
         addVisit("Method", this::dealWithMethod);
     }
 
+    private Type dealWithType(JmmNode jmmNode, String s) {
+        return new Type("null", false);
+    }
+
     private Type dealWithMethod(JmmNode jmmNode, String s) {
         for(JmmNode child: jmmNode.getChildren()){
             switch (child.getKind()){
-                case "Declaration":
-                    visit(child);
-                    break;
                 case "Stmt":
                 case "IfElseStmt":
                 case "WhileStmt":
@@ -42,7 +44,7 @@ public class ProgramAnalyser extends PreorderJmmVisitor<String, Type> {
                 case "Assignment":
                 case "ArrayAssignment":
                     StatementAnalyser statementAnalyser = new StatementAnalyser(symbolTable,reports);
-                    statementAnalyser.visit(child);
+                    statementAnalyser.visit(child, "");
                     break;
                 case "Parenthesis":
                 case "Indexing":
@@ -57,36 +59,38 @@ public class ProgramAnalyser extends PreorderJmmVisitor<String, Type> {
                 case "Identifier":
                 case "This":
                     ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
-                    expressionAnalyser.visit(child);
+                    Type type = expressionAnalyser.visit(child, "");
                     break;
             }
         }
-        return null;
+        return new Type("null", false);
     }
 
     private Type dealWithDeclaration(JmmNode jmmNode, String s) {
-        return  null;
+        visit(jmmNode.getJmmChild(0), "");
+        return new Type("null", false);
     }
 
     private Type dealWithClass(JmmNode jmmNode, String s) {
         for(JmmNode child: jmmNode.getChildren()){
-            visit(jmmNode);
+            if(child.getKind().equals("Method")){
+                visit(child, "");
+            }
         }
-        return null;
+        return new Type("null", false);
     }
 
     private Type dealWithImport(JmmNode jmmNode, String s) {
-        return null;
+        return new Type("null", false);
     }
 
     private Type dealWithProgram(JmmNode jmmNode, String s) {
         for(JmmNode child: jmmNode.getChildren()){
-            if(Objects.equals(child.getKind(), "Class")) {
-                visit(child, null);
-                return null;
+            if(child.getKind().equals("Class")){
+                visit(child,"");
             }
         }
-        return null;
+        return new Type("null", false);
     }
 
 
