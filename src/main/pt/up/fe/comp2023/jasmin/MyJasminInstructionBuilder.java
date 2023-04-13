@@ -10,9 +10,11 @@ import static java.lang.Integer.parseInt;
 
 public class MyJasminInstructionBuilder {
     private final Method method;
+    private final String superClass;
 
-    public MyJasminInstructionBuilder(Method method) {
+    public MyJasminInstructionBuilder(Method method, String superClass) {
         this.method = method;
+        this.superClass = superClass;
     }
 
     //method to build a jasmin instruction
@@ -129,7 +131,7 @@ public class MyJasminInstructionBuilder {
         if(rightHandMostSymbol.getInstType() == InstructionType.BINARYOPER){
             BinaryOpInstruction binaryExpression = (BinaryOpInstruction) rightHandMostSymbol;
             OperationType sign = binaryExpression.getOperation().getOpType();
-            if(sign == OperationType.ADD || sign == OperationType.SUB){
+            if(sign == OperationType.ADD || sign == OperationType.SUB || sign == OperationType.MUL || sign == OperationType.DIV){
                 String valueSign = "";
                 if(sign == OperationType.SUB) valueSign = "-";
                 int reg = register(leftHandMostSymbol);
@@ -176,6 +178,16 @@ public class MyJasminInstructionBuilder {
             }
             case invokestatic, invokespecial, invokevirtual -> {
                 StringBuilder stringBuilder = new StringBuilder();
+
+                if(method.isConstructMethod() && instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS){
+                    stringBuilder.append("\taload_0\n");
+                    stringBuilder.append("\tinvokenonvirtual ");
+                    stringBuilder.append(this.superClass).append("/<init>()V").append("\n\treturn\n");
+
+                    return stringBuilder.toString();
+                }
+
+
                 CallType callType = instruction.getInvocationType();
 
                 if(callType != CallType.invokestatic){
