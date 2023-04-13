@@ -36,8 +36,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
 
     private Type dealWithExpression(JmmNode jmmNode, String s) {
         ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
-        expressionAnalyser.visit(jmmNode.getJmmChild(0));
-        return null;
+        return expressionAnalyser.visit(jmmNode.getJmmChild(0));
     }
 
     private Type dealWithArrayAssignment(JmmNode jmmNode, String s) {
@@ -45,6 +44,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
     }
 
     private Type dealWithStmt(JmmNode jmmNode, String s) {
+        //Visit all children
         for(JmmNode child: jmmNode.getChildren()){
             visit(child);
         }
@@ -87,7 +87,6 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
 
         String methodName = parent.get("methodName");
 
-
         //Get fields
         List<Symbol> fields = symbolTable.getFields();
         //Check if var is a field
@@ -100,12 +99,10 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
             }
         }
 
-
         //Get List of local variables
         List<Symbol> locals = symbolTable.getLocalVariables(methodName);
         //check if var is a local variable
         if(locals != null){
-
             for(Symbol l :locals){
                 if(l.getName().equals(var)){
                     varType = l.getType();
@@ -125,15 +122,14 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
             }
         }
 
-        System.out.println("VarName " + var + " Type " + varType);
-        System.out.println("ChildKind: " + child.getKind() + "//ChildType " + childType.getName());
-
 
         //Checks if varType equals Super class and child type equals current class
         if((varType.getName().equals(symbolTable.getSuper()) && childType.getName().equals(symbolTable.getClassName()))){
-            System.out.println("AQUIIIII");
-        }else if(symbolTable.getImports().contains(varType.getName()) && symbolTable.getImports().contains(childType.getName())){
-
+            return childType;
+        }
+        //Checks if both types are imported
+        else if(symbolTable.getImports().contains(varType.getName()) && symbolTable.getImports().contains(childType.getName())){
+            return childType;
         }
         //Checks if assignee and assigner have different types
         else if(!varType.getName().equals(childType.getName())){

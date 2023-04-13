@@ -4,7 +4,6 @@ import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp.jmm.ast.PreorderJmmVisitor;
 import pt.up.fe.comp.jmm.report.Report;
 import pt.up.fe.comp.jmm.report.ReportType;
 import pt.up.fe.comp.jmm.report.Stage;
@@ -12,8 +11,6 @@ import pt.up.fe.comp2023.MySymbolTable;
 
 
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 
 public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
@@ -75,11 +72,16 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                 return new Type("error", false);
             }
         }
+        if(symbolTable.getReturnType(methodName) == null){
+            return new Type("importCorrect", false);
+        };
+
         return symbolTable.getReturnType(methodName);
 
     }
 
     private Type dealWithNewObject(JmmNode jmmNode, String s) {
+        //Type of new object
         return new Type(jmmNode.get("name"),false);
     }
 
@@ -87,8 +89,9 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
         JmmNode child =jmmNode.getJmmChild(0);
         Type childType = visit(child,"");
 
+        //Check if expression creating array is of type int
         if(!childType.getName().equals("int")){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Array initialization requires integer size"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Array initialization requires integer size"));
         }
         return  new Type("int", true);
     }
@@ -99,8 +102,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
         //Checks if child type is boolean
         if(!childType.getName().equals("boolean")){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "Only boolean type can be used with not operator"));
-            //return new Type("error", false);
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Only boolean type can be used with not operator"));
         }
 
         return new Type("boolean",false);
@@ -138,13 +140,13 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
     //Deal with length Method
     private Type dealWithLengthMethod(JmmNode jmmNode, String s) {
-        JmmNode leftChild = jmmNode.getJmmChild(0);
+        JmmNode child = jmmNode.getJmmChild(0);
         //visit LeftChild
-        Type leftChildType = visit(leftChild,"");
+        Type leftChildType = visit(child,"");
 
         //Check if leftChild is not an array
         if(!leftChildType.isArray()){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "LengthMethod error, " + leftChild.getJmmChild(0).get("name") + " is not an array"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "LengthMethod error, " + child.getJmmChild(0).get("name") + " is not an array"));
             return new Type("error", false);
         }
         return new Type("int", false);
@@ -168,15 +170,12 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             parent = parent.getJmmParent();
         }
 
-
-
         if(parent.getKind().equals("Method")){
             String methodName = parent.get("methodName");
 
-
             //Get local variables from method
             List<Symbol> locals = symbolTable.getLocalVariables(methodName);
-            //Check if identifier is a local variables
+            //Check if identifier is a local variable
             if(locals != null){
                 for (Symbol l : locals){
                     if(l.getName().equals(name)){
@@ -190,7 +189,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             //Check if identifier is a parameter
             if(parameters != null){
                 for (Symbol p: parameters){
-                    if(p.getName() == name){
+                    if(p.getName().equals(name)){
                         return p.getType();
                     }
                 }
@@ -201,16 +200,14 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             //Check if identifier is a field
             if(fields != null){
                 for(Symbol f:fields){
-                    if(f.getName() == name){
+                    if(f.getName().equals(name)){
                         //Do I need to verify if the method is main? Fields cannot be used in main method?
                         return  f.getType();
                     }
                 }
             }
 
-
             //No imports or Variable not in the imports.
-            //Do I need to check superClassName ??
             if(symbolTable.getImports() == null || !symbolTable.getImports().contains(name)){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Variable " + name + " not declared"));
             }
@@ -220,12 +217,16 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
     }
 
     private Type dealWithThis(JmmNode jmmNode, String s) {
+        //Get parent method
         JmmNode parent = jmmNode.getJmmParent();
+        while(!parent.getKind().equals("Method")){
+            parent = parent.getJmmParent();
+        }
 
-
-        if(parent.getKind().equals("methodDeclaration")){
+        if(parent.getKind().equals("Method")){
+            //Check if name of the method is main (this cannot be used in static method)
             if(parent.get("methodName") == "main"){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("line")), Integer.parseInt(jmmNode.get("col")), "This cannot be used in main method"));
+                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "This cannot be used in static method"));
             }
         }
 
@@ -242,8 +243,9 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
         Type leftType= visit(leftChild,"");
         Type rightType = visit(rightChild, "");
 
+
         //Check different types
-        if(leftType.getName() != rightType.getName()){
+        if(!leftType.getName().equals(rightType.getName())){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Operands have different types in " + op + "operation" ));
         }//check if left or right is an array
         else if(leftType.isArray() || rightType.isArray()) {
