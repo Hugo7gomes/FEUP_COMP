@@ -55,6 +55,8 @@ public class ProgramAnalyser extends AJmmVisitor<String, Type> {
                     System.out.println("aqui");
                 }
                 else if(!childType.getName().equals(symbolTable.getReturnType(methodName).getName())){
+                    System.out.println("Child type name" + childType.getName());
+                    System.out.println("Method Name: " + methodName + " Method return type " + symbolTable.getReturnType(methodName).getName());
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Return type is incorrect"));
                 }
             }

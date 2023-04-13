@@ -52,28 +52,35 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             if(symbolTable.getMethods().contains(methodName)){
                 //verify arguments type
                 List<Symbol> methodParams = symbolTable.getParameters(methodName);
-                for (int i = 1; i < jmmNode.getNumChildren(); i++){
-                    Type argType = visit(jmmNode.getJmmChild(i),"");
-                    // (i-1) because parameters index start at 0 and children that corresponds to arguments start at 1
-                    if(!methodParams.get(i - 1).getType().equals(argType)){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Error in argument type" ));
-                        return new Type("error", false);
+                //Check if number of parameters is different from number of arguments
+                if(methodParams.size() != (jmmNode.getNumChildren() - 1)){
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Error in number of arguments calling method" ));
+                }else{
+                    for (int i = 1; i < jmmNode.getNumChildren(); i++){
+                        Type argType = visit(jmmNode.getJmmChild(i),"");
+                        // (i-1) because parameters index start at 0 and children that corresponds to arguments start at 1
+                        if(!methodParams.get(i - 1).getType().equals(argType)){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Error in argument type" ));
+                        }
                     }
                 }
             }//checks if current class extends a super class
             else if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
-                return new Type("error", false);
             }
         }else{
             //checks if class is imported assume method is being called correctly
             if(!symbolTable.getImports().contains(classType.getName())){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Class not imported"));
-                return new Type("error", false);
             }
         }
-        if(symbolTable.getReturnType(methodName) == null && symbolTable.getImports().contains(classType.getName())){
-            return new Type("importCorrect", false);
+        if(symbolTable.getReturnType(methodName) == null){
+            if(symbolTable.getImports().contains(classType.getName())){
+                return new Type("importCorrect", false);
+            }else{
+                return new Type("importIncorrect", false);
+            }
+
         };
 
         return symbolTable.getReturnType(methodName);
