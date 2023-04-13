@@ -133,13 +133,11 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
         //Check if leftChild is not an array
         if(!leftType.isArray()){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Indexing error, " + leftChild.get("value") + " is not an array"));
-            return new Type("error", false);
         }
 
         //Check if type of index is not int
-        if(rightType.getName() != "int"){
+        if(!rightType.getName().equals("int")){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Indexing error,index is not int"));
-            return new Type("error", false);
         }
 
         return new Type("int", false);

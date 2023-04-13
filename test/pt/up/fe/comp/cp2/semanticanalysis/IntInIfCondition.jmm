@@ -5,7 +5,11 @@ class IntInIfCondition {
     }
 
     public int foo() {
-        if (1 + 2) {
+        int[] a;
+        int[] b;
+        a = new int[2];
+        b = new int[2];
+        while () {
         } else {
         }
 
