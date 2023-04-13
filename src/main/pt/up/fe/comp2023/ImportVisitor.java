@@ -34,7 +34,7 @@ public class ImportVisitor extends AJmmVisitor<Void,Void> {
 
     private Void dealWithProgram(JmmNode jmmNode, Void v) {
         for(JmmNode child: jmmNode.getChildren()){
-            if(Objects.equals(child.getKind(), "Class")){
+            if(Objects.equals(child.getKind(), "Class")) {
                 return null;
             }
             visit(child,null);
