@@ -21,12 +21,8 @@ public class ConvertOllirToJasmin {
 
         stringBuilder.append(".class public " ).append(classUnit.getClassName()).append("\n");
 
-        String superClass = classUnit.getSuperClass();
-        if (superClass != null) {
-            stringBuilder.append(".super " ).append(superClass).append("\n");
-        } else {
-            stringBuilder.append(".super java/lang/Object").append("\n\n");
-        }
+        String superClass = classUnit.getSuperClass() != null ? classUnit.getSuperClass() : "java/lang/Object";
+        stringBuilder.append(".super " ).append(superClass).append("\n");
 
         for(Field field: this.classUnit.getFields()){
             stringBuilder.append(buildField(field));
@@ -34,6 +30,7 @@ public class ConvertOllirToJasmin {
 
         stringBuilder.append(".method public <init>()V\n");
         stringBuilder.append("aload_0\n");
+
         stringBuilder.append("invokenonvirtual ").append(superClass).append("/<init>()V\n");
         stringBuilder.append("return\n");
         stringBuilder.append(".end method\n");
