@@ -19,114 +19,114 @@ public class MyJasminInstruction {
     }
 
     public static String pop() {
-        return "pop\n";
+        return "\tpop\n";
     }
     public static String dup() {
-        return "dup\n";
+        return "\tdup\n";
     }
 
     public static String iload(int register) {
-        return registerInstruction("iload", register);
+        return registerInstruction("\tiload", register);
     }
 
     public static String istore(int register) {
-        return registerInstruction("istore", register);
+        return registerInstruction("\tistore", register);
     }
 
     public static String aload(int register) {
-        return registerInstruction("aload", register);
+        return registerInstruction("\taload", register);
     }
 
     public static String astore(int register) {
-        return registerInstruction("astore", register);
+        return registerInstruction("\tastore", register);
     }
 
     public static String iaload() {
-        return "iaload\n";
+        return "\tiaload\n";
     }
 
     public static String iastore() {
-        return "iastore\n";
+        return "\tiastore\n";
     }
 
     public static String iconst(int value) {
         if(value == -1) {
-            return "iconst_m1\n";
+            return "\ticonst_m1\n";
         }
         if(value >= 0 && value <= 5) {
-            return "iconst_" + value + "\n";
+            return "\ticonst_" + value + "\n";
         }
         if (value >= -128 && value <= 127) {
-            return "bipush " + value + "\n";
+            return "\tbipush " + value + "\n";
         }
         if (value >= -32768 && value <= 32767) {
-            return "sipush " + value + "\n";
+            return "\tsipush " + value + "\n";
         }
-        return "ldc " + value + "\n";
+        return "\tldc " + value + "\n";
     }
     public static String arrayLength() {
-        return "arraylength\n";
+        return "\tarraylength\n";
     }
 
     public static String newArray() {
-        return "newarray int\n";
+        return "\tnewarray int\n";
     }
 
     public static String newObject(String className) {
-        return "new " + className + "\n";
+        return "\tnew " + className + "\n";
     }
 
     public static String gotoLabel(String label) {
-        return "goto " + label + "\n";
+        return "\tgoto " + label + "\n";
     }
 
     public static String ifne(String label) {
-        return "ifne " + label + "\n";
+        return "\tifne " + label + "\n";
     }
 
     public static String iinc(int register, String value) {
-        return "iinc " + register + " " + value + "\n";
+        return "\tiinc " + register + " " + value + "\n";
     }
 
     public static String iflt(String label) {
-        return "iflt " + label + "\n";
+        return "\tiflt " + label + "\n";
     }
 
     public static String if_icmplt(String label) {
-        return "if_icmplt " + label + "\n";
+        return "\tif_icmplt " + label + "\n";
     }
 
     public static String arithOp(OperationType op) {
         switch (op) {
             case ADD -> {
-                return "iadd\n";
+                return "\tiadd\n";
             }
             case SUB -> {
-                return "isub\n";
+                return "\tisub\n";
             }
             case MUL -> {
-                return "imul\n";
+                return "\timul\n";
             }
             case DIV -> {
-                return "idiv\n";
+                return "\tidiv\n";
             }
             case ANDB -> {
-                return "iand\n";
+                return "\tiand\n";
             }
             case OR -> {
-                return "ior\n";
+                return "\tior\n";
             }
         }
         return "";
     }
 
     public static String fieldOp(FieldInstructionType type, String className, String fieldName, String fieldType) {
-        return type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
+        return "\t" + type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
     public static String invokeOp(CallType callType, String className, String methodName, String argsTypes, int numArgs, String returnType) {
-        return callType.toString().toLowerCase() + " " + className + "/" + methodName +
-                "(" + argsTypes + ")" + returnType + "\n";
+        return "\t" + callType.toString().toLowerCase() + " " + className + "/" + methodName
+                + argsTypes +  returnType + "\n";
     }
 
 

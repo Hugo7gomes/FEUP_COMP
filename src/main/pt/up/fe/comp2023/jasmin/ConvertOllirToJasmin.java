@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 public class ConvertOllirToJasmin {
 
     private final ClassUnit classUnit;
+    private String superClass;
 
     public ConvertOllirToJasmin(ClassUnit classUnit) {
         this.classUnit = classUnit;
@@ -21,29 +22,25 @@ public class ConvertOllirToJasmin {
 
         stringBuilder.append(".class public " ).append(classUnit.getClassName()).append("\n");
 
-        String superClass = classUnit.getSuperClass();
-        if (superClass != null) {
-            stringBuilder.append(".super " ).append(superClass).append("\n");
-        } else {
-            stringBuilder.append(".super java/lang/Object").append("\n\n");
-        }
+        this.superClass = classUnit.getSuperClass() != null ? classUnit.getSuperClass() : "java/lang/Object";
+        stringBuilder.append(".super " ).append(superClass).append("\n");
 
         for(Field field: this.classUnit.getFields()){
             stringBuilder.append(buildField(field));
         }
 
-        stringBuilder.append(".method public <init>()V\n");
-        stringBuilder.append("aload_0\n");
-        stringBuilder.append("invokenonvirtual ").append(superClass).append("/<init>()V\n");
-        stringBuilder.append("return\n");
-        stringBuilder.append(".end method\n");
+/*        stringBuilder.append(".method public <init>()V\n");
+        stringBuilder.append("\taload_0\n");
 
-        stringBuilder.append("\n\n\n");
+        stringBuilder.append("\tinvokenonvirtual ").append(superClass).append("/<init>()V\n");
+        stringBuilder.append("\treturn\n");
+        stringBuilder.append(".end method\n");*/
+
 
         for(Method method: this.classUnit.getMethods()){
             stringBuilder.append(buildMethodHeader(method));
             stringBuilder.append(buildMethodStatements(method));
-            stringBuilder.append(".end method\n");
+            stringBuilder.append(".end method\n\n");
         }
 
         return stringBuilder.toString();
@@ -83,21 +80,20 @@ public class ConvertOllirToJasmin {
         AccessModifiers accessModifier = method.getMethodAccessModifier();
         StringBuilder access = new StringBuilder();
 
-        if(accessModifier != AccessModifiers.DEFAULT){
+        if(accessModifier == AccessModifiers.DEFAULT) {
+            access.append("public ");
+            stringBuilder.append(".method public <init>(");
+        } else {
             access.append(accessModifier.name().toLowerCase()).append(" ");
+            if (method.isStaticMethod()) {
+                access.append("static ");
+            }
+            if (method.isFinalMethod()) {
+                access.append("final ");
+            }
+            stringBuilder.append(".method " ).append(access);
+            stringBuilder.append(method.getMethodName()).append("(");
         }
-        if (method.isStaticMethod()) {
-            access.append("static ");
-        }
-        if (method.isFinalMethod()) {
-            access.append("final ");
-        }
-
-        stringBuilder.append(".method " ).append(access);
-        if (method.isStaticMethod()) {
-            access.append("static ");
-        }
-        stringBuilder.append(method.getMethodName()).append("(");
 
         String params = method.getParams().stream()
                 .map(param -> MyJasminUtils.getType(this.classUnit, param.getType()))
@@ -110,9 +106,12 @@ public class ConvertOllirToJasmin {
 
     public String buildMethodStatements(Method method){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(".limit stack 99\n");
-        stringBuilder.append(".limit locals 99\n");
-        MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method);
+        if(method.getMethodAccessModifier() != AccessModifiers.DEFAULT){
+
+            stringBuilder.append("\t.limit stack 99\n");
+            stringBuilder.append("\t.limit locals 99\n");
+        }
+        MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method, this.superClass);
 
         HashMap<String, Instruction> labels = method.getLabels();
 
@@ -128,7 +127,7 @@ public class ConvertOllirToJasmin {
             if (instruction.getInstType() == InstructionType.CALL) {
                 ElementType returnType = ((CallInstruction) instruction).getReturnType().getTypeOfElement();
                 CallType callType = ((CallInstruction) instruction).getInvocationType();
-                if (returnType != ElementType.VOID || callType == CallType.invokespecial) {
+                if (!method.isConstructMethod() && ( returnType != ElementType.VOID || callType == CallType.invokespecial)) {
                     stringBuilder.append(MyJasminInstruction.pop());
                 }
             }

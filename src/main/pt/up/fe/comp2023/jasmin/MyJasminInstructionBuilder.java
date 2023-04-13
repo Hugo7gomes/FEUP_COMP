@@ -10,9 +10,11 @@ import static java.lang.Integer.parseInt;
 
 public class MyJasminInstructionBuilder {
     private final Method method;
+    private final String superClass;
 
-    public MyJasminInstructionBuilder(Method method) {
+    public MyJasminInstructionBuilder(Method method, String superClass) {
         this.method = method;
+        this.superClass = superClass;
     }
 
     //method to build a jasmin instruction
@@ -70,7 +72,7 @@ public class MyJasminInstructionBuilder {
             return MyJasminInstruction.iconst(parseInt(((LiteralElement) element).getLiteral()));
         }
 
-        if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
+        if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
             int reg = register(element);
             ElementType varType = lookup(element).getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
@@ -79,7 +81,7 @@ public class MyJasminInstructionBuilder {
             return MyJasminInstruction.iload(reg);
         }
 
-        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS){
+        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
             int reg = register(element);
             return MyJasminInstruction.aload(reg);
         }
@@ -109,14 +111,14 @@ public class MyJasminInstructionBuilder {
 
     private String buildReturn(ReturnInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
-        if(!instruction.hasReturnValue()) return "return\n";
+        if(!instruction.hasReturnValue()) return "\treturn\n";
         Element resultValue = instruction.getOperand();
         stringBuilder.append(loadOp(resultValue));
         Type returnType = method.getReturnType();
         if(returnType.getTypeOfElement() == ElementType.INT32 || returnType.getTypeOfElement() == ElementType.BOOLEAN){
-            stringBuilder.append("ireturn\n");
+            stringBuilder.append("\tireturn\n");
         } else {
-            stringBuilder.append("areturn\n");
+            stringBuilder.append("\tareturn\n");
         }
         return stringBuilder.toString();
 
@@ -129,7 +131,7 @@ public class MyJasminInstructionBuilder {
         if(rightHandMostSymbol.getInstType() == InstructionType.BINARYOPER){
             BinaryOpInstruction binaryExpression = (BinaryOpInstruction) rightHandMostSymbol;
             OperationType sign = binaryExpression.getOperation().getOpType();
-            if(sign == OperationType.ADD || sign == OperationType.SUB){
+            if(sign == OperationType.ADD || sign == OperationType.SUB || sign == OperationType.MUL || sign == OperationType.DIV){
                 String valueSign = "";
                 if(sign == OperationType.SUB) valueSign = "-";
                 int reg = register(leftHandMostSymbol);
@@ -176,6 +178,16 @@ public class MyJasminInstructionBuilder {
             }
             case invokestatic, invokespecial, invokevirtual -> {
                 StringBuilder stringBuilder = new StringBuilder();
+
+                if(method.isConstructMethod() && instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS){
+                    stringBuilder.append("\taload_0\n");
+                    stringBuilder.append("\tinvokenonvirtual ");
+                    stringBuilder.append(this.superClass).append("/<init>()V").append("\n\treturn\n");
+
+                    return stringBuilder.toString();
+                }
+
+
                 CallType callType = instruction.getInvocationType();
 
                 if(callType != CallType.invokestatic){
