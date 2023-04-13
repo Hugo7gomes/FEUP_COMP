@@ -187,7 +187,6 @@ public class MyJasminInstructionBuilder {
                     return stringBuilder.toString();
                 }
 
-
                 CallType callType = instruction.getInvocationType();
 
                 if(callType != CallType.invokestatic){
@@ -304,7 +303,7 @@ public class MyJasminInstructionBuilder {
         else {
             fieldInstruction = MyJasminInstruction.FieldInstructionType.PUTFIELD;
         }
-        String className = MyJasminUtils.getClassName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
+        String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
         String fieldName = ((Operand)fieldElem).getName();
         String fieldType = MyJasminUtils.getType(method.getOllirClass(), fieldElem.getType());
         return MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);

@@ -13,4 +13,8 @@ Test {
         ret.V;
     }
 
+    .method public static test().V {
+        ret.V;
+    }
+
 }
