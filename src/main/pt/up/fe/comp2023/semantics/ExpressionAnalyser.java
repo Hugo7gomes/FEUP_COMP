@@ -184,6 +184,8 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             if(locals != null){
                 for (Symbol l : locals){
                     if(l.getName().equals(name)){
+                        System.out.println("Typeeee: " + l.getType() );
+                        System.out.println("Variable Name" + name);
                         return l.getType();
                     }
                 }

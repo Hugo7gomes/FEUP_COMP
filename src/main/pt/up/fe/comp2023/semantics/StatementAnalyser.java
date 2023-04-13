@@ -28,11 +28,13 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
     protected void buildVisitor() {
         addVisit("Stmt", this::dealWithStmt);
         addVisit("Assignment", this::dealWithAssignment);
-        addVisit("IfElseStmt", this::dealConditionalStmt);
-        addVisit("WhileStmt", this::dealConditionalStmt);
+        addVisit("IfElseStmt", this::dealIfConditionalStmt);
+        addVisit("WhileStmt", this::dealWhileConditionalStmt);
         addVisit("ArrayAssignment", this::dealWithArrayAssignment);
         addVisit("ExprStmt",this::dealWithExpression);
+
     }
+
 
     private Type dealWithExpression(JmmNode jmmNode, String s) {
         ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
@@ -122,7 +124,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
     }
 
     //Deal with While and If conditional expression
-    private Type dealConditionalStmt(JmmNode jmmNode, String s) {
+    private Type dealWhileConditionalStmt(JmmNode jmmNode, String s) {
         //Get conditional expression node
         JmmNode child = jmmNode.getJmmChild(0);
         //Create expressionAnalyser
@@ -132,11 +134,33 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         //Checks if type is not boolean
         if(!childType.getName().equals("boolean")){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Conditional expression needs to return a boolean" ));
-            return new Type("error", false);
         }
+        //Visit statement inside while
+        visit(jmmNode.getJmmChild(1));
         return childType;
 
     }
+
+    private Type dealIfConditionalStmt(JmmNode jmmNode, String s) {
+        //Get conditional expression node
+        JmmNode child = jmmNode.getJmmChild(0);
+        //Create expressionAnalyser
+        ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
+        //Visit node and get Type
+        Type childType = expressionAnalyser.visit(child, "");
+        //Checks if type is not boolean
+        if(!childType.getName().equals("boolean")){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Conditional expression needs to return a boolean" ));
+        }
+        //Visit statement inside if
+        visit(jmmNode.getJmmChild(1));
+        //visit statement inside else
+        visit(jmmNode.getJmmChild(2));
+        return childType;
+
+    }
+
+
 
 
     private Type dealWithAssignment(JmmNode jmmNode, String s) {
