@@ -1,0 +1,18 @@
+class whileIfArrayWhileCondNotBool {
+
+    public static void main(String[] args) {
+
+    }
+
+    public int foo() {
+        int a;
+        boolean b;
+        while (b) {
+            while(a){
+
+            }
+        }
+
+        return 0;
+    }
+}
