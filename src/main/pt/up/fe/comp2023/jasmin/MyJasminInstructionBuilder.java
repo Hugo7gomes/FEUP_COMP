@@ -196,14 +196,16 @@ public class MyJasminInstructionBuilder {
                 for (Element param : params) {
                     stringBuilder.append(loadOp(param));
                 }
-                String className;
+                String className, classNameAux;
                 if(instruction.getInvocationType() != CallType.invokestatic){
                     ClassType classType = (ClassType) instruction.getFirstArg().getType();
-                    className = classType.getName();
+                    classNameAux = classType.getName();
+                    className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
                 }
                 else {
                     ClassType classType = (ClassType) instruction.getReturnType();
-                    className = classType.getName();
+                    classNameAux = classType.getName();
+                    className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
                 }
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
