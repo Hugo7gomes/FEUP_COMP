@@ -72,7 +72,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                 return new Type("error", false);
             }
         }
-        if(symbolTable.getReturnType(methodName) == null){
+        if(symbolTable.getReturnType(methodName) == null && symbolTable.getImports().contains(classType.getName())){
             return new Type("importCorrect", false);
         };
 
