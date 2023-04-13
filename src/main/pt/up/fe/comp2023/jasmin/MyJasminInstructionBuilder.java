@@ -70,7 +70,7 @@ public class MyJasminInstructionBuilder {
             return MyJasminInstruction.iconst(parseInt(((LiteralElement) element).getLiteral()));
         }
 
-        if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
+        if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
             int reg = register(element);
             ElementType varType = lookup(element).getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
@@ -79,7 +79,7 @@ public class MyJasminInstructionBuilder {
             return MyJasminInstruction.iload(reg);
         }
 
-        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS){
+        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
             int reg = register(element);
             return MyJasminInstruction.aload(reg);
         }
