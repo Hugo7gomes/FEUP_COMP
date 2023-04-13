@@ -109,14 +109,14 @@ public class MyJasminInstructionBuilder {
 
     private String buildReturn(ReturnInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
-        if(!instruction.hasReturnValue()) return "return\n";
+        if(!instruction.hasReturnValue()) return "\treturn\n";
         Element resultValue = instruction.getOperand();
         stringBuilder.append(loadOp(resultValue));
         Type returnType = method.getReturnType();
         if(returnType.getTypeOfElement() == ElementType.INT32 || returnType.getTypeOfElement() == ElementType.BOOLEAN){
-            stringBuilder.append("ireturn\n");
+            stringBuilder.append("\tireturn\n");
         } else {
-            stringBuilder.append("areturn\n");
+            stringBuilder.append("\tareturn\n");
         }
         return stringBuilder.toString();
 

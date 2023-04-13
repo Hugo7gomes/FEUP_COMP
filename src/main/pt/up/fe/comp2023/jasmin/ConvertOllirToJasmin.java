@@ -29,10 +29,10 @@ public class ConvertOllirToJasmin {
         }
 
         stringBuilder.append(".method public <init>()V\n");
-        stringBuilder.append("aload_0\n");
+        stringBuilder.append("\taload_0\n");
 
-        stringBuilder.append("invokenonvirtual ").append(superClass).append("/<init>()V\n");
-        stringBuilder.append("return\n");
+        stringBuilder.append("\tinvokenonvirtual ").append(superClass).append("/<init>()V\n");
+        stringBuilder.append("\treturn\n");
         stringBuilder.append(".end method\n");
 
         stringBuilder.append("\n\n\n");
@@ -107,8 +107,8 @@ public class ConvertOllirToJasmin {
 
     public String buildMethodStatements(Method method){
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(".limit stack 99\n");
-        stringBuilder.append(".limit locals 99\n");
+        stringBuilder.append("\t.limit stack 99\n");
+        stringBuilder.append("\t.limit locals 99\n");
         MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method);
 
         HashMap<String, Instruction> labels = method.getLabels();
