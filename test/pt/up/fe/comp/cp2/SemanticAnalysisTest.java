@@ -69,6 +69,7 @@ public class SemanticAnalysisTest {
     @Test
     public void objectAssignmentPassExtends() {
         var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/ObjectAssignmentPassExtends.jmm"));
+        System.out.println(result.getReports());
         TestUtils.noErrors(result);
     }
 

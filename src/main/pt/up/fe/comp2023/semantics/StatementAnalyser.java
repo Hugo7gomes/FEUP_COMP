@@ -40,6 +40,75 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
     }
 
     private Type dealWithArrayAssignment(JmmNode jmmNode, String s) {
+        String var = jmmNode.get("var");
+        JmmNode childIndex = jmmNode.getJmmChild(0);
+        JmmNode childAssignment = jmmNode.getJmmChild(1);
+
+        //Get Index type
+        Type indexType = visit(childIndex);
+        //Get assignment
+        Type assignmentType = visit(childAssignment);
+
+        Type varType = new Type("", false);
+        //Var type
+        JmmNode parent = jmmNode.getJmmParent();
+        while(!parent.getKind().equals("Method")){
+            parent = parent.getJmmParent();
+        }
+
+        String methodName = parent.get("methodName");
+
+        //Get fields
+        List<Symbol> fields = symbolTable.getFields();
+        //Check if var is a field
+        if(fields != null){
+            for(Symbol f: fields){
+                if(f.getName().equals(var)){
+                    if(methodName.equals("main")){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
+                    }
+                    varType = f.getType();
+                    break;
+                }
+            }
+        }
+
+        //Get List of local variables
+        List<Symbol> locals = symbolTable.getLocalVariables(methodName);
+        //check if var is a local variable
+        if(locals != null){
+            for(Symbol l :locals){
+                if(l.getName().equals(var)){
+                    varType = l.getType();
+                    break;
+                }
+            }
+        }
+
+        //Get List of parameters of the method
+        List<Symbol> parameters  = symbolTable.getParameters(methodName);
+        //check if var is a parameter
+        if(parameters != null){
+            for(Symbol p:parameters){
+                if(p.getName().equals(var)){
+                    varType = p.getType();
+                }
+            }
+        }
+
+        //Checks if variable is an array
+        if(!varType.isArray()){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Array assignment variable not array"));
+        }
+        //Checks if index is an integer
+        if(!indexType.getName().equals("int")){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Index needs to be an integer"));
+        }
+        //Checks if assignee is an integer
+        if(!assignmentType.getName().equals("int")){
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Assignment needs to be an integer"));
+        }
+
         return null;
     }
 
@@ -93,6 +162,9 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         if(fields != null){
             for(Symbol f: fields){
                 if(f.getName().equals(var)){
+                    if(methodName.equals("main")){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
+                    }
                     varType = f.getType();
                     break;
                 }

@@ -202,6 +202,9 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                 for(Symbol f:fields){
                     if(f.getName().equals(name)){
                         //Do I need to verify if the method is main? Fields cannot be used in main method?
+                        if(methodName.equals("main")){
+                            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
+                        }
                         return  f.getType();
                     }
                 }
@@ -225,7 +228,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
         if(parent.getKind().equals("Method")){
             //Check if name of the method is main (this cannot be used in static method)
-            if(parent.get("methodName") == "main"){
+            if(parent.get("methodName").equals("main")){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "This cannot be used in static method"));
             }
         }
