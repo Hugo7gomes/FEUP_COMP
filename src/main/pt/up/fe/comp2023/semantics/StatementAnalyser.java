@@ -44,10 +44,11 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         JmmNode childIndex = jmmNode.getJmmChild(0);
         JmmNode childAssignment = jmmNode.getJmmChild(1);
 
+        ExpressionAnalyser expressionAnalyser = new ExpressionAnalyser(symbolTable,reports);
         //Get Index type
-        Type indexType = visit(childIndex);
+        Type indexType = expressionAnalyser.visit(childIndex);
         //Get assignment
-        Type assignmentType = visit(childAssignment);
+        Type assignmentType = expressionAnalyser.visit(childAssignment);
 
         Type varType = new Type("", false);
         //Var type

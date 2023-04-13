@@ -7,9 +7,10 @@ class ArrayPlusInt {
     public int foo() {
         int[] a;
         int b;
+        boolean c;
 
         a = new int[2];
-        b = 10;
+        b[a] = 1;
         return a + b;
     }
 }

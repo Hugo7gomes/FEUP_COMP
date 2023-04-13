@@ -39,6 +39,7 @@ public class SemanticAnalysisTest {
     @Test
     public void arrayPlusInt() {
         var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/ArrayPlusInt.jmm"));
+        System.out.println(result.getReports());
         TestUtils.mustFail(result);
     }
 
