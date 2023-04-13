@@ -8,7 +8,6 @@ public class SemanticAnalysisTest {
 
     @Test
     public void symbolTable() {
-
         var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/SymbolTable.jmm"));
         System.out.println("Symbol Table:\n" + result.getSymbolTable().print());
     }
@@ -123,6 +122,7 @@ public class SemanticAnalysisTest {
         var result = TestUtils
                 .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/IncompatibleReturn.jmm"));
         TestUtils.mustFail(result);
+        System.out.println(result.getReports());
     }
 
     @Test
