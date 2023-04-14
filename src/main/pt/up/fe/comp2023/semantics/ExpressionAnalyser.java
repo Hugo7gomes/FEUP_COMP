@@ -151,7 +151,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
 
         //Check if leftChild is not an array
         if(!leftChildType.isArray()){
-            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "LengthMethod error, " + child.getJmmChild(0).get("name") + " is not an array"));
+            reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method length only applies to arrays"));
             return new Type("error", false);
         }
         return new Type("int", false);
