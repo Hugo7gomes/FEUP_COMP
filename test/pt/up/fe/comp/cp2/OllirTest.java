@@ -62,7 +62,6 @@ public class OllirTest {
         // Test name of the class and super
         assertEquals("Class name not what was expected", "CompileBasic", classUnit.getClassName());
         assertEquals("Super class name not what was expected", "Quicksort", classUnit.getSuperClass());
-
         // Test fields
         assertEquals("Class should have two fields", 2, classUnit.getNumFields());
         var fieldNames = new HashSet<>(Arrays.asList("intField", "boolField"));
