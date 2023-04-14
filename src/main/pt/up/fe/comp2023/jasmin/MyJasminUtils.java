@@ -5,6 +5,9 @@ import org.specs.comp.ollir.ElementType;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 import org.specs.comp.ollir.*;
 
+import java.util.ArrayList;
+import java.util.Set;
+
 public class MyJasminUtils {
     public static String getType(ClassUnit context, Type type) {
         StringBuilder typeBuilder = new StringBuilder();
@@ -21,7 +24,7 @@ public class MyJasminUtils {
             case OBJECTREF -> {
                 assert type instanceof ClassType;
                 String className = ((ClassType) type).getName();
-                typeBuilder.append("L").append(getClassName(context, className)).append(";");
+                typeBuilder.append("L").append(getQualifiedName(context, className)).append(";");
             }
             default -> throw new NotImplementedException("Type not implemented: " + elementType);
         }
@@ -29,16 +32,19 @@ public class MyJasminUtils {
         return typeBuilder.toString();
     }
 
-    public static String getClassName(ClassUnit context, String className) {
-        if(className.equals("this")) {
-            return context.getClassName();
-        }
-        for(String importName : context.getImports()) {
-            if(importName.endsWith(className)) {
-                return importName.replaceAll("\\.", "/");
+    public static String getQualifiedName(ClassUnit context, String className) {
+        for (String importString : context.getImports()) {
+            var splitImports = importString.split("\\.");
+            String lastName;
+            if (splitImports.length == 0) {
+                lastName = importString;
+            } else {
+                lastName = splitImports[splitImports.length - 1];
+            }
+            if (lastName.equals(className)) {
+                return importString.replace('.', '/');
             }
         }
-
-        return className;
+        return context.getClassName().replace("\\.", "/");
     }
 }

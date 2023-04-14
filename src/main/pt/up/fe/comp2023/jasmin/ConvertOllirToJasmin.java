@@ -127,7 +127,7 @@ public class ConvertOllirToJasmin {
             if (instruction.getInstType() == InstructionType.CALL) {
                 ElementType returnType = ((CallInstruction) instruction).getReturnType().getTypeOfElement();
                 CallType callType = ((CallInstruction) instruction).getInvocationType();
-                if (!method.isConstructMethod() && ( returnType != ElementType.VOID || callType == CallType.invokespecial)) {
+                if (!method.isConstructMethod() && (returnType != ElementType.VOID || callType == CallType.invokespecial)) {
                     stringBuilder.append(MyJasminInstruction.pop());
                 }
             }
