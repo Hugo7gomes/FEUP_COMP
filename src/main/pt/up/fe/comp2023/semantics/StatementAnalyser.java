@@ -215,6 +215,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
             for(Symbol p:parameters){
                 if(p.getName().equals(var)){
                     varType = p.getType();
+                    break;
                 }
             }
         }
