@@ -124,8 +124,8 @@ public class MyJasminInstruction {
         return "\t" + type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
-    public static String invokeOp(CallType callType, String className, String methodName, String argsTypes, int numArgs, String returnType) {
-        return "\t" + callType.toString().toLowerCase() + " " + className + "/" + methodName
+    public static String invokeOp(CallType callType, String className, String methodName, String argsTypes, String returnType) {
+        return "\t" + callType.toString() + " " + className + "/" + methodName
                 + argsTypes +  returnType + "\n";
     }
 

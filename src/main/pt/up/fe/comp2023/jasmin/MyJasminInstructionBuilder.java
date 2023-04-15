@@ -176,7 +176,25 @@ public class MyJasminInstructionBuilder {
             case arraylength -> {
                 return loadOp(instruction.getFirstArg()) + MyJasminInstruction.arrayLength();
             }
-            case invokestatic, invokespecial, invokevirtual -> {
+
+            case invokestatic -> {
+                StringBuilder stringBuilder = new StringBuilder();
+                CallType callType = instruction.getInvocationType();
+                ClassType classType = (ClassType) instruction.getReturnType();
+                String classNameAux = classType.getName();
+                String className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
+                String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
+                Type returnType = instruction.getReturnType();
+                ArrayList<Element> params = instruction.getListOfOperands();
+                for (Element param : params) {
+                    stringBuilder.append(loadOp(param));
+                }
+
+                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName,argTypes(params), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                return stringBuilder.toString();
+            }
+
+            case invokespecial, invokevirtual -> {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 if(method.isConstructMethod() && instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS){
@@ -210,7 +228,7 @@ public class MyJasminInstructionBuilder {
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
 
-                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName, argTypes(params),params.size(), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName, argTypes(params), MyJasminUtils.getType(method.getOllirClass(), returnType)));
 
                 return stringBuilder.toString();
             }
