@@ -25,6 +25,8 @@ public class MyJasminInstructionBuilder {
             case ASSIGN -> ret =buildAssign((AssignInstruction) instruction);
             case CALL -> ret =buildCall((CallInstruction) instruction);
             case RETURN -> ret = buildReturn((ReturnInstruction) instruction);
+            case PUTFIELD -> ret = buildPutField((PutFieldInstruction) instruction);
+            case GETFIELD -> ret = buildGetField((GetFieldInstruction) instruction);
             case UNARYOPER -> ret = buildUnaryOp((UnaryOpInstruction) instruction);
             case BINARYOPER -> ret = buildBinaryOp((BinaryOpInstruction) instruction);
             case NOPER -> ret = buildSingleOp((SingleOpInstruction) instruction);
@@ -176,11 +178,15 @@ public class MyJasminInstructionBuilder {
             case invokestatic -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 CallType callType = instruction.getInvocationType();
+
                 Operand operand = (Operand) instruction.getFirstArg();
                 String classNameAux = operand.getName();
                 String className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
+
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
+
                 Type returnType = instruction.getReturnType();
+
                 ArrayList<Element> params = instruction.getListOfOperands();
                 for (Element param : params) {
                     stringBuilder.append(loadOp(param));
@@ -256,6 +262,43 @@ public class MyJasminInstructionBuilder {
         }
         return stringBuilder.toString();
     }
+
+    private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
+        MyJasminInstruction.FieldInstructionType fieldInstruction;
+        if(type.equals(InstructionType.GETFIELD)){
+            fieldInstruction = MyJasminInstruction.FieldInstructionType.GETFIELD;
+        }
+        else {
+            fieldInstruction = MyJasminInstruction.FieldInstructionType.PUTFIELD;
+        }
+        String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
+        String fieldName = ((Operand)fieldElem).getName();
+        String fieldType = MyJasminUtils.getType(method.getOllirClass(), fieldElem.getType());
+        return MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);
+    }
+
+    private String buildPutField(PutFieldInstruction instruction){
+        StringBuilder stringBuilder = new StringBuilder();
+        Element classElem = instruction.getFirstOperand();
+        Element fieldElem = instruction.getSecondOperand();
+        Element valueElem = instruction.getThirdOperand();
+        stringBuilder.append(loadOp(classElem));
+        stringBuilder.append(loadOp(valueElem));
+        stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.PUTFIELD));
+
+        return stringBuilder.toString();
+    }
+
+    private String buildGetField(GetFieldInstruction instruction){
+        StringBuilder stringBuilder = new StringBuilder();
+        Element classElem = instruction.getFirstOperand();
+        Element fieldElem = instruction.getSecondOperand();
+        stringBuilder.append(loadOp(classElem));
+        stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.GETFIELD));
+
+        return stringBuilder.toString();
+    }
+
 
     private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
