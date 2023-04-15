@@ -136,8 +136,15 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         JmmNode child = assignment.getJmmChild(0);
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), aux);
         codeOllir.append(ollirCodeRhs.prefixCode);
-        codeOllir.append(assignment.get("var")).append(".").append(OllirAuxFunctions.getTypeOllir(child.getKind()));
-        codeOllir.append(" :=.").append(OllirAuxFunctions.getTypeOllir(child.getKind())).append(" ").append(ollirCodeRhs.value).append(";\n");
+        codeOllir.append(assignment.get("var")).append(".");
+        String type = new String();
+        if(assignment.getJmmChild(0).getKind().equals("BinaryOp")){
+            type =OllirAuxFunctions.getTypeOllir(child.getJmmChild(0).getKind());
+        }else {
+            type = OllirAuxFunctions.getTypeOllir(child.getKind());
+            codeOllir.append(OllirAuxFunctions.getTypeOllir(child.getKind()));
+        }
+        codeOllir.append(type).append(" :=.").append(type).append(" ").append(ollirCodeRhs.value).append(";\n");
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
 
