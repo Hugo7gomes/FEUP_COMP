@@ -4,6 +4,7 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
@@ -33,12 +34,7 @@ public class MyJasminInstructionBuilder {
         }
         return ret;
     }
-
-    //method to get a variable in the method's var table
-    private Descriptor lookup(Element element){
-        return method.getVarTable().get(((Operand) element).getName());
-    }
-
+    
     //method to get arguments types of a method
     private String argTypes(ArrayList<Element> args){
         StringBuilder stringBuilder = new StringBuilder();
@@ -52,15 +48,16 @@ public class MyJasminInstructionBuilder {
 
     //method to return the virtual register of an element
     private int register(Element element){
-        return lookup(element).getVirtualReg();
+        HashMap<String, Descriptor> varTable = method.getVarTable();
+        return varTable.get(((Operand) element).getName()).getVirtualReg();
     }
 
     //
     private String getArray(Element element){
         int arrayReg = register(element);
-        Element index = ((ArrayOperand) element).getIndexOperands().get(0);
-        int indexReg = register(index);
-        return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(indexReg);
+        Element first = ((ArrayOperand) element).getIndexOperands().get(0);
+        int firstReg = register(first);
+        return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(firstReg);
     }
 
     private String loadOp(Element element) {
@@ -72,7 +69,8 @@ public class MyJasminInstructionBuilder {
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
             int reg = register(element);
-            ElementType varType = lookup(element).getVarType().getTypeOfElement();
+            Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
+            ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
                 return getArray(element) + MyJasminInstruction.iaload();
             }
@@ -92,7 +90,8 @@ public class MyJasminInstructionBuilder {
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
             int reg = register(element);
-            ElementType varType = lookup(element).getVarType().getTypeOfElement();
+            Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
+            ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
                 return getArray(element) + value + MyJasminInstruction.iastore();
             }
@@ -140,8 +139,7 @@ public class MyJasminInstructionBuilder {
                         String value = valueSign + ((LiteralElement) rightOperand).getLiteral();
                         return MyJasminInstruction.iinc(reg, value);
                     }
-                }
-                else if (leftOperand.isLiteral() && !rightOperand.isLiteral()){
+                } else if (leftOperand.isLiteral() && !rightOperand.isLiteral()){
                     if(Objects.equals(((Operand) rightOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
                         String value = valueSign + ((LiteralElement) leftOperand).getLiteral();
                         return MyJasminInstruction.iinc(reg, value);
