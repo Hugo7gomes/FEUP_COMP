@@ -4,11 +4,14 @@ class CompileAssignment {
 
     }
 
-    public int foo(int a, int b ) {
-        int c;
+    public int foo() {
+        int a;
+        int b;
 
-        a = b + 1;
-        c = a + b;
+        a = 1;
+        b = 2;
+
+
         return 0;
     }
 }

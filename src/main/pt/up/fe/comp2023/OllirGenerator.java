@@ -103,7 +103,12 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 OllirCodeStruct code = visit(returnNode, methodName);
                 codeOllir.append(code.prefixCode);
                 codeOllir.append("ret.").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(" ");
-                codeOllir.append(code.value).append(".").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(";\n");
+                codeOllir.append(code.value);
+                if(!code.value.contains(".")) {
+                    codeOllir.append(".")
+                            .append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName)));
+                }
+                codeOllir.append(";\n");
             }else {
                 codeOllir.append("ret.").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(" ");
                 OllirCodeStruct code = visit(returnNode, methodName);

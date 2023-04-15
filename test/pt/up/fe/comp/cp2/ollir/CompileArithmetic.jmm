@@ -4,11 +4,12 @@ class CompileArithmetic {
 
     }
 
-    public int foo() {
-        int a;
+    public int foo(int a) {
         int b;
+        int c;
         a = 1;
         b = 2;
+        c = a + b;
 
         return a + b;
     }
