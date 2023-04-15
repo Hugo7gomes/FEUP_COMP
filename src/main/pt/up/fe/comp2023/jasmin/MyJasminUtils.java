@@ -1,12 +1,8 @@
 package pt.up.fe.comp2023.jasmin;
 
 
-import org.specs.comp.ollir.ElementType;
-import pt.up.fe.specs.util.exceptions.NotImplementedException;
 import org.specs.comp.ollir.*;
-
-import java.util.ArrayList;
-import java.util.Set;
+import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 public class MyJasminUtils {
     public static String getType(ClassUnit context, Type type) {

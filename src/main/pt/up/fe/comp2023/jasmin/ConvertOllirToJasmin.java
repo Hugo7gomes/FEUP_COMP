@@ -1,10 +1,6 @@
 package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.*;
-import pt.up.fe.comp2023.jasmin.MyJasminInstruction;
-import pt.up.fe.comp2023.jasmin.MyJasminInstructionBuilder;
-import pt.up.fe.comp2023.jasmin.MyJasminUtils;
-
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -28,14 +24,6 @@ public class ConvertOllirToJasmin {
         for(Field field: this.classUnit.getFields()){
             stringBuilder.append(buildField(field));
         }
-
-/*        stringBuilder.append(".method public <init>()V\n");
-        stringBuilder.append("\taload_0\n");
-
-        stringBuilder.append("\tinvokenonvirtual ").append(superClass).append("/<init>()V\n");
-        stringBuilder.append("\treturn\n");
-        stringBuilder.append(".end method\n");*/
-
 
         for(Method method: this.classUnit.getMethods()){
             stringBuilder.append(buildMethodHeader(method));

@@ -1,15 +1,9 @@
 package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.CallType;
-import org.specs.comp.ollir.FieldInstruction;
 import org.specs.comp.ollir.OperationType;
 
 public class MyJasminInstruction {
-
-    public enum FieldInstructionType {
-        GETFIELD,
-        PUTFIELD,
-    }
 
     private static String registerInstruction(String instruction, int register) {
         if(register >= 0 && register <= 3) {
@@ -76,25 +70,10 @@ public class MyJasminInstruction {
         return "\tnew " + className + "\n";
     }
 
-    public static String gotoLabel(String label) {
-        return "\tgoto " + label + "\n";
-    }
-
-    public static String ifne(String label) {
-        return "\tifne " + label + "\n";
-    }
-
     public static String iinc(int register, String value) {
         return "\tiinc " + register + " " + value + "\n";
     }
 
-    public static String iflt(String label) {
-        return "\tiflt " + label + "\n";
-    }
-
-    public static String if_icmplt(String label) {
-        return "\tif_icmplt " + label + "\n";
-    }
 
     public static String arithOp(OperationType op) {
         switch (op) {
@@ -120,18 +99,9 @@ public class MyJasminInstruction {
         return "";
     }
 
-    public static String fieldOp(FieldInstructionType type, String className, String fieldName, String fieldType) {
-        return "\t" + type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
-    }
-
     public static String invokeOp(CallType callType, String className, String methodName, String argsTypes, String returnType) {
         return "\t" + callType.toString() + " " + className + "/" + methodName
                 + argsTypes +  returnType + "\n";
     }
-
-
-
-
-
 
 }

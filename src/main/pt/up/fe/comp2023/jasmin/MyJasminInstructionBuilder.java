@@ -221,9 +221,7 @@ public class MyJasminInstructionBuilder {
 
                 return stringBuilder.toString();
             }
-            default -> {
-                throw new NotImplementedException(instruction);
-            }
+            default -> throw new NotImplementedException(instruction);
         }
     }
 
@@ -256,87 +254,6 @@ public class MyJasminInstructionBuilder {
             stringBuilder.append(loadOp(operand));
             stringBuilder.append(MyJasminInstruction.arithOp(OperationType.SUB));
         }
-        return stringBuilder.toString();
-    }
-
-    private String buildGoto(GotoInstruction instruction){
-        return MyJasminInstruction.gotoLabel(instruction.getLabel());
-    }
-
-    private String ifBinaryConditionInstruction(BinaryOpInstruction condition, String label){
-        StringBuilder stringBuilder = new StringBuilder();
-        Element leftOperand = condition.getLeftOperand();
-        Element rightOperand = condition.getRightOperand();
-        OperationType opType = condition.getOperation().getOpType();
-
-        if(opType == OperationType.LTH){
-            String compare;
-            stringBuilder.append(loadOp(leftOperand));
-            if(rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0")){
-                compare = MyJasminInstruction.iflt(label);
-            }
-            else {
-                stringBuilder.append(loadOp(rightOperand));
-                compare = MyJasminInstruction.if_icmplt(label);
-            }
-            stringBuilder.append(compare);
-        }
-        else{
-            stringBuilder.append(ifConditionInstruction(condition, label));
-        }
-        return stringBuilder.toString();
-    }
-
-    private String ifConditionInstruction(Instruction condition, String label){
-        return buildInstruction(condition) + MyJasminInstruction.ifne(label);
-    }
-
-    private String buildBranch(CondBranchInstruction instruction){
-        StringBuilder stringBuilder = new StringBuilder();
-        Instruction condition = instruction.getCondition();
-        String label = instruction.getLabel();
-        if(condition.getInstType() == InstructionType.BINARYOPER){
-            stringBuilder.append(ifBinaryConditionInstruction((BinaryOpInstruction) condition, label));
-        }
-        else {
-            stringBuilder.append(ifConditionInstruction(condition, label));
-        }
-        return stringBuilder.toString();
-    }
-
-    private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
-        MyJasminInstruction.FieldInstructionType fieldInstruction;
-        if(type.equals(InstructionType.GETFIELD)){
-            fieldInstruction = MyJasminInstruction.FieldInstructionType.GETFIELD;
-        }
-        else {
-            fieldInstruction = MyJasminInstruction.FieldInstructionType.PUTFIELD;
-        }
-        String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
-        String fieldName = ((Operand)fieldElem).getName();
-        String fieldType = MyJasminUtils.getType(method.getOllirClass(), fieldElem.getType());
-        return MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);
-    }
-
-    private String buildPutField(PutFieldInstruction instruction){
-        StringBuilder stringBuilder = new StringBuilder();
-        Element classElem = instruction.getFirstOperand();
-        Element fieldElem = instruction.getSecondOperand();
-        Element valueElem = instruction.getThirdOperand();
-        stringBuilder.append(loadOp(classElem));
-        stringBuilder.append(loadOp(valueElem));
-        stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.PUTFIELD));
-
-        return stringBuilder.toString();
-    }
-
-    private String buildGetField(GetFieldInstruction instruction){
-        StringBuilder stringBuilder = new StringBuilder();
-        Element classElem = instruction.getFirstOperand();
-        Element fieldElem = instruction.getSecondOperand();
-        stringBuilder.append(loadOp(classElem));
-        stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.GETFIELD));
-
         return stringBuilder.toString();
     }
 
