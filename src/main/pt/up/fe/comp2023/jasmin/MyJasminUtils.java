@@ -30,7 +30,7 @@ public class MyJasminUtils {
 
     public static String getQualifiedName(ClassUnit context, String className) {
         for (String importString : context.getImports()) {
-            var splitImports = importString.split("\\.");
+            var splitImports = "\\.".split(importString);
             String lastName;
             if (splitImports.length == 0) {
                 lastName = importString;
