@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -127,15 +128,23 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     private OllirCodeStruct dealWithIdentifier(JmmNode jmmNode, String methodName) {
         Type returnType = symbolTable.getReturnType(methodName);
         StringBuilder code = new StringBuilder();
+        int index;
+        if((index = getParameters(methodName, jmmNode.get("value"))) != -1){
+            code.append("$").append(index).append(".");
+        }
         code.append(jmmNode.get("value")).append(".").append(OllirAuxFunctions.getCode(returnType));
         return new OllirCodeStruct("", code.toString());
     }
 
-    private OllirCodeStruct dealWithAssignment(JmmNode assignment, String aux) {
+    private OllirCodeStruct dealWithAssignment(JmmNode assignment, String methodName) {
         StringBuilder code = new StringBuilder();
         JmmNode child = assignment.getJmmChild(0);
-        OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), aux);
+        OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
+        int index;
+        if((index = getParameters(methodName, assignment.get("var"))) != -1){
+            codeOllir.append("$").append(index).append(".");
+        }
         codeOllir.append(assignment.get("var")).append(".");
         String type = new String();
         if(assignment.getJmmChild(0).getKind().equals("BinaryOp")){
@@ -146,6 +155,9 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
 
         if(type.equals("Identifier")){
+            if((index = getParameters(methodName, ollirCodeRhs.value.split("\\.")[0])) != -1){
+                codeOllir.append("$").append(index).append(".");
+            }
             type = ollirCodeRhs.value.split("\\.")[1];
         }
 
@@ -203,6 +215,17 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 "invokespecial(this, \"<init>\").V;\n" +
                 "}\n\n";
     }
+
+    private int getParameters(String methodName, String varName){
+        int parameterNumber = 1;
+        for (Symbol parameter : symbolTable.getParameters(methodName)) {
+            if(parameter.getName().equals(varName))
+                return parameterNumber;
+            parameterNumber++;
+        }
+        return -1;
+    }
+
 
     @Override
     protected void buildVisitor() {
