@@ -5,6 +5,12 @@ import org.specs.comp.ollir.OperationType;
 
 public class MyJasminInstruction {
 
+    public enum FieldInstructionType {
+        GETFIELD,
+        PUTFIELD,
+    }
+
+
     private static String registerInstruction(String instruction, int register) {
         if(register >= 0 && register <= 3) {
             return instruction + "_" + register + "\n";
@@ -103,5 +109,10 @@ public class MyJasminInstruction {
         return "\t" + callType.toString() + " " + className + "/" + methodName
                 + argsTypes +  returnType + "\n";
     }
+
+    public static String fieldOp(FieldInstructionType type, String className, String fieldName, String fieldType) {
+        return "\t" + type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
+    }
+
 
 }
