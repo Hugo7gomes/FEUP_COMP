@@ -91,11 +91,16 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             if(!jmmNode.getJmmParent().getKind().equals("Class")) {
                 return new OllirCodeStruct();
             }
+            Type type = OllirAuxFunctions.getType(jmmNode.getJmmChild(0));
+
+            codeOllir.append(".field private ").append(OllirAuxFunctions.getCode(new Symbol(type, jmmNode.get("value")))).append(";\n");
+            return new OllirCodeStruct();
+            /*
             codeOllir.append(".field private ");
             String fieldName = jmmNode.get("value");
             String typeName = jmmNode.getChildren().get(0).get("name");
             codeOllir.append(fieldName).append(".").append(OllirAuxFunctions.getTypeOllir(typeName)).append(";\n");
-            return new OllirCodeStruct();
+            return new OllirCodeStruct();*/
     }
 
     private OllirCodeStruct dealWithReturn(JmmNode returnNode, String methodName) {
