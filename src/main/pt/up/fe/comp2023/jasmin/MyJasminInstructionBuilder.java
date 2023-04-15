@@ -24,11 +24,7 @@ public class MyJasminInstructionBuilder {
         switch (inst) {
             case ASSIGN -> ret =buildAssign((AssignInstruction) instruction);
             case CALL -> ret =buildCall((CallInstruction) instruction);
-            case GOTO -> ret = buildGoto((GotoInstruction) instruction);
-            case BRANCH -> ret = buildBranch((CondBranchInstruction) instruction);
             case RETURN -> ret = buildReturn((ReturnInstruction) instruction);
-            case PUTFIELD -> ret = buildPutField((PutFieldInstruction) instruction);
-            case GETFIELD -> ret = buildGetField((GetFieldInstruction) instruction);
             case UNARYOPER -> ret = buildUnaryOp((UnaryOpInstruction) instruction);
             case BINARYOPER -> ret = buildBinaryOp((BinaryOpInstruction) instruction);
             case NOPER -> ret = buildSingleOp((SingleOpInstruction) instruction);
@@ -196,6 +192,7 @@ public class MyJasminInstructionBuilder {
 
             case invokespecial, invokevirtual -> {
                 StringBuilder stringBuilder = new StringBuilder();
+                String className, classNameAux;
 
                 if(method.isConstructMethod() && instruction.getFirstArg().getType().getTypeOfElement() == ElementType.THIS){
                     stringBuilder.append("\taload_0\n");
@@ -206,25 +203,17 @@ public class MyJasminInstructionBuilder {
                 }
 
                 CallType callType = instruction.getInvocationType();
+                stringBuilder.append(loadOp(instruction.getFirstArg()));
 
-                if(callType != CallType.invokestatic){
-                    stringBuilder.append(loadOp(instruction.getFirstArg()));
-                }
                 ArrayList<Element> params = instruction.getListOfOperands();
                 for (Element param : params) {
                     stringBuilder.append(loadOp(param));
                 }
-                String className, classNameAux;
-                if(instruction.getInvocationType() != CallType.invokestatic){
-                    ClassType classType = (ClassType) instruction.getFirstArg().getType();
-                    classNameAux = classType.getName();
-                    className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
-                }
-                else {
-                    Operand operand = (Operand) instruction.getFirstArg();
-                    classNameAux = operand.getName();
-                    className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
-                }
+
+                ClassType classType = (ClassType) instruction.getFirstArg().getType();
+                classNameAux = classType.getName();
+                className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
+
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
 
