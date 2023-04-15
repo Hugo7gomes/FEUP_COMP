@@ -1,20 +1,15 @@
-Test {
+import io;
+Arithmetic_add {
 
-	.construct Test().V {
-		invokespecial(this, "<init>").V;
-	}
+    .construct Arithmetic_add().V {
+        invokespecial(this, "<init>").V;
+    }
 
-	.method public static main(args.array.String).V {
-		ret.V;
-	}
+    .method public static main(args.array.String).V {
+        a.i32 :=.i32 2.i32 +.i32 3.i32;
+        invokestatic(io, "print", a.i32).V;
 
-	
-	.method public foo().i32 {
-		a.i32 :=.i32 1.i32;
-		b.i32 :=.i32 2.i32;
+        ret.V;
+    }
 
-		c.i32 :=.i32 a.i32 +.i32 b.i32;
-
-		ret.i32 c.i32;
-	}
 }

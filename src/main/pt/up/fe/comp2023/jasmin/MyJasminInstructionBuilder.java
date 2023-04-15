@@ -180,8 +180,8 @@ public class MyJasminInstructionBuilder {
             case invokestatic -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 CallType callType = instruction.getInvocationType();
-                ClassType classType = (ClassType) instruction.getReturnType();
-                String classNameAux = classType.getName();
+                Operand operand = (Operand) instruction.getFirstArg();
+                String classNameAux = operand.getName();
                 String className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
@@ -221,8 +221,8 @@ public class MyJasminInstructionBuilder {
                     className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
                 }
                 else {
-                    ClassType classType = (ClassType) instruction.getReturnType();
-                    classNameAux = classType.getName();
+                    Operand operand = (Operand) instruction.getFirstArg();
+                    classNameAux = operand.getName();
                     className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
                 }
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
