@@ -140,9 +140,15 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         String type = new String();
         if(assignment.getJmmChild(0).getKind().equals("BinaryOp")){
             type =OllirAuxFunctions.getTypeOllir(child.getJmmChild(0).getKind());
-        }else {
+        }
+        else {
             type = OllirAuxFunctions.getTypeOllir(child.getKind());
         }
+
+        if(type.equals("Identifier")){
+            type = ollirCodeRhs.value.split("\\.")[1];
+        }
+
         codeOllir.append(type).append(" :=.").append(type).append(" ").append(ollirCodeRhs.value).append(";\n");
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
