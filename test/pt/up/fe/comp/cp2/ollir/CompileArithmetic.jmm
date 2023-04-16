@@ -1,11 +1,8 @@
-import io;
+class NoArgsFuncCall {
 
-class CompileArithmetic {
-	public static void main(String[] args) {
-		int a;
-
-		a = 20 / 4;
-		
-		io.print(a);
-	}
+    public int bar(NoArgsFuncCall c) {
+        int a;
+        a = c.bar();
+        return 1;
+    }
 }

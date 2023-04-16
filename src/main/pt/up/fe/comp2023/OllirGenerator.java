@@ -28,7 +28,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         for(String imports: symbolTable.getImports()){
             codeOllir.append("import ").append(imports).append(";\n");
         }
-        System.out.println(codeOllir.toString());
         for(JmmNode child: program.getChildren()){
             if(!child.getKind().equals("Import")){
                 visit(child);
@@ -165,9 +164,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         if((index = getParameters(methodName, assignment.get("var"))) != -1){
             codeOllir.append("$").append(index).append(".");
         }
-        codeOllir.append(assignment.get("var")).append(".");
+        //codeOllir.append(assignment.get("var")).append(".");
         String type = new String();
-        if(assignment.getJmmChild(0).getKind().equals("BinaryOp")){
+        type = getType(assignment, methodName, assignment.get("var"));
+        /*if(assignment.getJmmChild(0).getKind().equals("BinaryOp")){
             type =OllirAuxFunctions.getTypeOllir(child.getJmmChild(0).getKind());
         }
         else {
@@ -179,9 +179,8 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 codeOllir.append("$").append(index).append(".");
             }
             type = ollirCodeRhs.value.split("\\.")[1];
-        }
-
-        codeOllir.append(type).append(" :=.").append(type).append(" ").append(ollirCodeRhs.value).append(";\n");
+        }*/
+        codeOllir.append(type).append(" :=.").append(type.split("\\.")[1]).append(" ").append(ollirCodeRhs.value).append(";\n");
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
 
@@ -201,27 +200,42 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithExprStmt(JmmNode ExprStmt, String methodName) {
-        JmmNode methodCall = ExprStmt.getJmmChild(0);
+        JmmNode methodCall = ExprStmt;
+        if(ExprStmt.getJmmChild(0).getKind().equals("MethodCall")){
+            methodCall = ExprStmt.getJmmChild(0);
+        }
         JmmNode identifier = methodCall.getJmmChild(0);
-        JmmNode arguments = methodCall.getJmmChild(1);
-        Optional<String> identifierType = identifier.getOptional("type");
-        OllirCodeStruct args = visit(arguments, methodName);
-        codeOllir.append(args.prefixCode);
-        String returnType = new String();
+        OllirCodeStruct args = new OllirCodeStruct("", "");
+        if(methodCall.getChildren().size() > 1){
+            JmmNode arguments = methodCall.getJmmChild(1);
+            args = visit(arguments, methodName);
+        }
+        String identifierType = getType(identifier, methodName, identifier.get("value"));;
 
-        if(identifierType.isPresent()){
-            codeOllir.append("invokevirtual(");
-            returnType = identifierType.get();
+        String returnType = new String();
+        StringBuilder code = new StringBuilder();
+        if(!identifierType.equals("")){
+            code.append("invokevirtual(").append(identifierType);
         }else{
-            codeOllir.append("invokestatic(");
+            code.append("invokestatic(");
+            code.append(identifier.get("value"));
             returnType = ".V";
         }
-
-        codeOllir.append(identifier.get("value")).append(", \"").append(methodCall.get("name")).append("\"").append(", ")
-                .append(args.value).append(")").append(returnType).append(";\n");
-
-        return new OllirCodeStruct();
+        code.append(", \"").append(methodCall.get("name")).append("\"");
+        if(!args.value.equals("")){
+            code.append(", ").append(args.value);
+        }
+        code.append(")").append(returnType);
+        if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
+            code.append(";\n");
+            codeOllir.append(args.prefixCode);
+            codeOllir.append(code.toString());
+            return new OllirCodeStruct();
+        }else{
+            return new OllirCodeStruct(args.prefixCode, code.toString());
+        }
     }
+
 
 
     public String getCode() {
@@ -246,6 +260,26 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         return -1;
     }
 
+    private String getType(JmmNode jmmNode, String methodName, String variableName){
+        StringBuilder result = new StringBuilder();
+        while(!jmmNode.getKind().equals("Method")){
+            jmmNode = jmmNode.getJmmParent();
+        }
+        for(JmmNode child: jmmNode.getChildren()) {
+            if (child.getKind().equals("Declaration") && child.get("value").equals(variableName)) {
+                result.append(variableName).append(".").append(OllirAuxFunctions.getCode(new Type(child.getJmmChild(0).get("name"), child.getJmmChild(0).get("isArray").equals("true"))));
+                return result.toString();
+            }
+        }
+        int index;
+        if((index = getParameters(methodName, variableName)) != -1){
+            result.append("$").append(index).append(".").append(variableName).append(".").append(OllirAuxFunctions.getCode(new Type(jmmNode.getJmmChild(index).get("name"), jmmNode.getJmmChild(index).get("isArray").equals("true"))));
+            return result.toString();
+        }
+        return "";
+
+    }
+
 
     @Override
     protected void buildVisitor() {
@@ -260,6 +294,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("Assignment", this::dealWithAssignment);
         addVisit("BinaryOp", this::dealWithBinaryOp);
         addVisit("ExprStmt", this::dealWithExprStmt);
+        addVisit("MethodCall", this::dealWithExprStmt);
     }
 
 
