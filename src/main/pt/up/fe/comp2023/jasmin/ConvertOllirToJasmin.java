@@ -54,6 +54,7 @@ public class ConvertOllirToJasmin {
         if(accessModifier != AccessModifiers.DEFAULT){
             access.append(accessModifier.name().toLowerCase()).append(" ");
         }
+
         if (field.isStaticField()) {
             access.append("static ");
         }
@@ -68,13 +69,8 @@ public class ConvertOllirToJasmin {
 
         // Field Return Type
         stringBuilder.append(MyJasminUtils.getType(this.classUnit, field.getFieldType()));
+        stringBuilder.append("\n");
 
-        // Field Initial Value
-        if(field.isInitialized()) {
-            stringBuilder.append(" = ").append(field.getInitialValue()).append("\n");
-        } else {
-            stringBuilder.append("\n");
-        }
         return stringBuilder.toString();
     }
 
@@ -86,7 +82,6 @@ public class ConvertOllirToJasmin {
         StringBuilder access = new StringBuilder();
 
         if(accessModifier == AccessModifiers.DEFAULT) {
-            access.append("public ");
             stringBuilder.append(".method public <init>(");
 
         } else {
@@ -121,7 +116,6 @@ public class ConvertOllirToJasmin {
 
         // Method Stack and Local Limits
         if(method.getMethodAccessModifier() != AccessModifiers.DEFAULT){
-
             stringBuilder.append("\t.limit stack 99\n");
             stringBuilder.append("\t.limit locals 99\n");
         }
