@@ -5,8 +5,7 @@ import Other;
 class BasicMethods extends Other {
 
 
-    public BasicMethods func3(){
-        BasicMethods p1;
+    public BasicMethods func3(BasicMethods p1){
         p1 = new BasicMethods();
         return p1;
     }
