@@ -1,0 +1,17 @@
+
+class Foo extends Bar {
+
+    public static void main(String[] args) {
+
+    }
+
+    public int test() {
+        Foo a;
+
+        a = this;
+        a.method();
+        
+
+        return a.method();
+    }
+}
