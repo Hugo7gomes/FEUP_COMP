@@ -31,8 +31,8 @@ public class JmmAnalysisImpl implements JmmAnalysis {
         symbolTable.create(jmmParserResult);
 
         System.out.println(jmmParserResult.getRootNode().toTree());
-        //ProgramAnalyser programAnalyser = new ProgramAnalyser(symbolTable,reports);
-        //programAnalyser.visit(node, "");
+        ProgramAnalyser programAnalyser = new ProgramAnalyser(symbolTable,reports);
+        programAnalyser.visit(node, "");
 
         return new JmmSemanticsResult(jmmParserResult, symbolTable, reports);
 

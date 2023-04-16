@@ -7,11 +7,13 @@ class CallToMethodAssumedInExtends extends A {
     }
 
     public int foo() {
+        int b;
         CallToMethodAssumedInExtends a;
         a = new CallToMethodAssumedInExtends();
 
+
         // Assume bar() is in A
-        a.bar();
+        a.bar(b);
 
         return 0;
     }
