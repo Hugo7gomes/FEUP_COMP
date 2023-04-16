@@ -1,8 +1,14 @@
-class NoArgsFuncCall {
+import io;
+import Other;
+// import Person;
 
-    public int bar(NoArgsFuncCall c) {
-        int a;
-        a = c.bar();
-        return 1;
+class BasicMethods extends Other {
+
+
+    public BasicMethods func3(){
+        BasicMethods p1;
+        p1 = new BasicMethods();
+        return p1;
     }
+
 }

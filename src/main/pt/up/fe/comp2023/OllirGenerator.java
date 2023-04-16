@@ -166,6 +166,9 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         String type = getType(assignment, methodName, assignment.get("var"));
 
         codeOllir.append(type).append(" :=.").append(type.split("\\.")[1]).append(" ").append(ollirCodeRhs.value).append(";\n");
+        if(assignment.getJmmChild(0).getKind().equals("NewObject")){
+            codeOllir.append("invokepecial(").append(type.split("\\.")[1]).append(", \"<init>\").V;\n");
+        }
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
 
@@ -226,6 +229,12 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
 
+    private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
+        StringBuilder code = new StringBuilder();
+        code.append("new(").append(jmmNode.get("name")).append(").").append(jmmNode.get("name"));
+        return new OllirCodeStruct("", code.toString());
+    }
+
 
     public String getCode() {
         return codeOllir.toString();
@@ -276,7 +285,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("Class", this::dealWithClass);
         addVisit("Method", this::dealWithMethod);
         addVisit("Declaration", this::dealWithDeclaration);
-        //addVisit("Return", this::dealWithReturn);
         addVisit("Integer", this::dealWithInteger);
         addVisit("Boolean", this::dealWithBoolean);
         addVisit("Identifier", this::dealWithIdentifier);
@@ -284,10 +292,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("BinaryOp", this::dealWithBinaryOp);
         addVisit("ExprStmt", this::dealWithExprStmt);
         addVisit("MethodCall", this::dealWithExprStmt);
+        addVisit("NewObject", this::dealWithNewObject);
     }
-
-
-
-
 }
 
