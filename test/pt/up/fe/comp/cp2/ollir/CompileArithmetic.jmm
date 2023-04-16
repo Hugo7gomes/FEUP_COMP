@@ -1,16 +1,11 @@
+import io;
+
 class CompileArithmetic {
+	public static void main(String[] args) {
+		int a;
 
-    public static void main(String[] args) {
-
-    }
-
-    public int foo(int[] a) {
-        int b;
-        int c;
-        a = 1;
-        b = 2;
-        c = a + b;
-
-        return a + b;
-    }
+		a = 20 / 4;
+		
+		io.print(a);
+	}
 }
