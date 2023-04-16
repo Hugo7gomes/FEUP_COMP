@@ -1,4 +1,3 @@
-import Bar;
 
 class Foo extends Bar {
 
@@ -8,8 +7,10 @@ class Foo extends Bar {
 
     public int test() {
         Foo a;
+
         a = this;
         a.method();
+        
 
         return a.method();
     }
