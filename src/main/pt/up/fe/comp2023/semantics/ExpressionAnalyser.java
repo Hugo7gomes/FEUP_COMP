@@ -65,8 +65,12 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                     }
                 }
             }//checks if current class extends a super class
-            else if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
-                reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
+            else{
+                if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
+                    reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
+                }else{
+                    return new Type("importCorrect", false);
+                }
             }
         }else{
             //checks if class is imported assume method is being called correctly
