@@ -1,11 +1,16 @@
-import Dummy;
+class CompileArithmetic {
 
-class NoArgsFuncCall {
+    public static void main(String[] args) {
 
-    public int bar(Dummy c) {
+    }
 
-        c.bar();
+    public int foo() {
+        int a;
+        int b;
 
-        return 1;
+        a = 1;
+        b = 2;
+
+        return a + b;
     }
 }
