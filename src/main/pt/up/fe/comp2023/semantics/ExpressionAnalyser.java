@@ -45,6 +45,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
         String methodName = jmmNode.get("name");
         JmmNode classCall = jmmNode.getJmmChild(0);
         Type classType = visit(classCall,"");
+        System.out.println(classType);
 
         //The class calling the method is the current class
         if(classType.getName().equals(symbolTable.getClassName())){
@@ -66,7 +67,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                 }
             }//checks if current class extends a super class
             else{
-                if((symbolTable.getSuper() == null)){
+                if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
                 }else{
                     return new Type("importCorrect", false);
@@ -222,6 +223,8 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             //No imports or Variable not in the imports.
             if(symbolTable.getImports() == null || !symbolTable.getImports().contains(name)){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Variable " + name + " not declared"));
+            }else{
+                return new Type(name, false);
             }
         }
         //Dummy return

@@ -10,7 +10,7 @@ class Foo extends Bar {
 
         a = this;
         a.method();
-        
+
 
         return a.method();
     }
