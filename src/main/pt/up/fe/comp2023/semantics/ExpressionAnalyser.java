@@ -67,7 +67,7 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                 }
             }//checks if current class extends a super class
             else{
-                if(!(symbolTable.getSuper() != null && symbolTable.getImports().contains(symbolTable.getSuper()))){
+                if(symbolTable.getSuper() == null){
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
                 }else{
                     return new Type("importCorrect", false);
@@ -77,15 +77,18 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             //checks if class is imported assume method is being called correctly
             if(!symbolTable.getImports().contains(classType.getName())){
                 reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Class not imported"));
+                return new Type("importIncorrect", false);
+            }else{
+                return new Type("importCorrect", false);
             }
         }
+
         if(symbolTable.getReturnType(methodName) == null){
             if(symbolTable.getImports().contains(classType.getName())){
                 return new Type("importCorrect", false);
             }else{
                 return new Type("importIncorrect", false);
             }
-
         };
 
         return symbolTable.getReturnType(methodName);

@@ -10,6 +10,7 @@ class CompileAssignment {
 
         b = 2;
 
+        a = b;
 
         return 0;
     }

@@ -220,13 +220,16 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
             }
         }
 
-
+        System.out.println("VarType" + varType);
+        System.out.println("Child Type" + childType);
         //Checks if varType equals Super class and child type equals current class
         if((varType.getName().equals(symbolTable.getSuper()) && childType.getName().equals(symbolTable.getClassName()))){
             return childType;
         }
         //Checks if both types are imported
         else if(symbolTable.getImports().contains(varType.getName()) && symbolTable.getImports().contains(childType.getName())){
+            return childType;
+        }else if(childType.getName().equals("importCorrect")){
             return childType;
         }
         //Checks if assignee and assigner have different types
@@ -235,7 +238,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
             return new Type("errorType", false);
         }
 
-        return childType;
+        return varType;
 
     }
 }

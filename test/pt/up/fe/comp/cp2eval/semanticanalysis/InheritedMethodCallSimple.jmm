@@ -1,0 +1,17 @@
+import A;
+
+class InheritedMethodCallSimple extends A{
+
+    public static void main(String[] args) {
+
+    }
+
+    public int foo() {
+        InheritedMethodCallSimple b;
+        A c;
+        int d;
+
+        d = b.test();
+        return d;
+    }
+}
