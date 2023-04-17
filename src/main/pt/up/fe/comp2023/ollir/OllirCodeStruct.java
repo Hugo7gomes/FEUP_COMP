@@ -1,4 +1,4 @@
-package pt.up.fe.comp2023;
+package pt.up.fe.comp2023.ollir;
 
 public class OllirCodeStruct {
     public String prefixCode;

@@ -1,4 +1,4 @@
-package pt.up.fe.comp2023;
+package pt.up.fe.comp2023.ollir;
 
 import pt.up.fe.comp.jmm.analysis.table.Symbol;
 import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
@@ -7,11 +7,9 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-import static pt.up.fe.comp2023.OllirAuxFunctions.nextTemp;
+import static pt.up.fe.comp2023.ollir.OllirAuxFunctions.nextTemp;
 
 public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     private final SymbolTable symbolTable;
@@ -22,7 +20,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         this.symbolTable = symbolTable;
         buildVisitor();
     }
-
 
     private OllirCodeStruct dealWithProgram(JmmNode program, String aux) {
         for(String imports: symbolTable.getImports()){
@@ -68,7 +65,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 parametersCode.append(", ");
             }
         }
-        System.out.println(parametersCode);
         codeOllir.append(parametersCode).append(").").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(" {\n");
 
 
@@ -159,11 +155,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         StringBuilder code = new StringBuilder();
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
-        int index;
-        /*
-        if((index = getParameters(methodName, assignment.get("var"))) != -1){
-            codeOllir.append("$").append(index).append(".");
-        }*/
         String type = getType(assignment, methodName, assignment.get("var"));
 
         codeOllir.append(type).append(" :=.").append(type.split("\\.")[1]).append(" ").append(ollirCodeRhs.value).append(";\n");
@@ -217,7 +208,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
             code.append(returnType).append(";\n");
             codeOllir.append(args.prefixCode);
-            codeOllir.append(code.toString());
+            codeOllir.append(code);
             return new OllirCodeStruct();
         }else{
             if(ExprStmt.getJmmParent().getKind().equals("Assignment")){
