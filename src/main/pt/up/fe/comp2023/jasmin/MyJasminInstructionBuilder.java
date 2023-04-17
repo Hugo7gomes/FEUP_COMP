@@ -34,31 +34,8 @@ public class MyJasminInstructionBuilder {
         }
         return ret;
     }
-    
-    //method to get arguments types of a method
-    private String argTypes(ArrayList<Element> args){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("(");
-        for(Element arg: args){
-            stringBuilder.append(MyJasminUtils.getType(method.getOllirClass(), arg.getType()));
-        }
-        stringBuilder.append(")");
-        return stringBuilder.toString();
-    }
 
-    //method to return the virtual register of an element
-    private int register(Element element){
-        HashMap<String, Descriptor> varTable = method.getVarTable();
-        return varTable.get(((Operand) element).getName()).getVirtualReg();
-    }
 
-    //
-    private String getArray(Element element){
-        int arrayReg = register(element);
-        Element first = ((ArrayOperand) element).getIndexOperands().get(0);
-        int firstReg = register(first);
-        return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(firstReg);
-    }
 
     private String loadOp(Element element) {
         ElementType type = element.getType().getTypeOfElement();
@@ -68,17 +45,17 @@ public class MyJasminInstructionBuilder {
         }
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
-            int reg = register(element);
+            int reg = MyJasminUtils.register(element, this.method);
             Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
             ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
-                return getArray(element) + MyJasminInstruction.iaload();
+                return MyJasminUtils.getArray(element, this.method) + MyJasminInstruction.iaload();
             }
             return MyJasminInstruction.iload(reg);
         }
 
         if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
-            int reg = register(element);
+            int reg = MyJasminUtils.register(element, this.method);
             return MyJasminInstruction.aload(reg);
         }
 
@@ -89,17 +66,17 @@ public class MyJasminInstructionBuilder {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
-            int reg = register(element);
+            int reg = MyJasminUtils.register(element,this.method);
             Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
             ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
-                return getArray(element) + value + MyJasminInstruction.iastore();
+                return MyJasminUtils.getArray(element,this.method) + value + MyJasminInstruction.iastore();
             }
             return value + MyJasminInstruction.istore(reg);
         }
 
         if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS){
-            int reg = register(element);
+            int reg = MyJasminUtils.register(element, this.method);
             return value + MyJasminInstruction.astore(reg);
         }
 
@@ -131,7 +108,7 @@ public class MyJasminInstructionBuilder {
             if(sign == OperationType.ADD || sign == OperationType.SUB || sign == OperationType.MUL || sign == OperationType.DIV){
                 String valueSign = "";
                 if(sign == OperationType.SUB) valueSign = "-";
-                int reg = register(leftHandMostSymbol);
+                int reg = MyJasminUtils.register(leftHandMostSymbol, this.method);
                 Element leftOperand = binaryExpression.getLeftOperand();
                 Element rightOperand = binaryExpression.getRightOperand();
                 if(!leftOperand.isLiteral() && rightOperand.isLiteral()){
@@ -190,7 +167,7 @@ public class MyJasminInstructionBuilder {
                     stringBuilder.append(loadOp(param));
                 }
 
-                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName,argTypes(params), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName,MyJasminUtils.argTypes(params, this.method), MyJasminUtils.getType(method.getOllirClass(), returnType)));
                 return stringBuilder.toString();
             }
 
@@ -221,7 +198,7 @@ public class MyJasminInstructionBuilder {
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
                 Type returnType = instruction.getReturnType();
 
-                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName, argTypes(params), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName, MyJasminUtils.argTypes(params, this.method), MyJasminUtils.getType(method.getOllirClass(), returnType)));
 
                 return stringBuilder.toString();
             }

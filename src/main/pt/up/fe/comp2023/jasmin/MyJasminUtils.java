@@ -4,6 +4,9 @@ package pt.up.fe.comp2023.jasmin;
 import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class MyJasminUtils {
     public static String getType(ClassUnit context, Type type) {
         StringBuilder typeBuilder = new StringBuilder();
@@ -28,6 +31,16 @@ public class MyJasminUtils {
         return typeBuilder.toString();
     }
 
+    public static String argTypes(ArrayList<Element> args, Method method){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("(");
+        for(Element arg: args){
+            stringBuilder.append(MyJasminUtils.getType(method.getOllirClass(), arg.getType()));
+        }
+        stringBuilder.append(")");
+        return stringBuilder.toString();
+    }
+
     public static String getQualifiedName(ClassUnit context, String className) {
         for (String importString : context.getImports()) {
             var splitImports = importString.split("\\.");
@@ -42,5 +55,17 @@ public class MyJasminUtils {
             }
         }
         return context.getClassName().replace("\\.", "/");
+    }
+
+    public static int register(Element element, Method method){
+        HashMap<String, Descriptor> varTable = method.getVarTable();
+        return varTable.get(((Operand) element).getName()).getVirtualReg();
+    }
+
+    public static String getArray(Element element, Method method){
+        int arrayReg = register(element, method);
+        Element first = ((ArrayOperand) element).getIndexOperands().get(0);
+        int firstReg = register(first, method);
+        return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(firstReg);
     }
 }
