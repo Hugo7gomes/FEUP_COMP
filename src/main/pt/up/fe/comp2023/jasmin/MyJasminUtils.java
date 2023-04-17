@@ -57,15 +57,15 @@ public class MyJasminUtils {
         return context.getClassName().replace("\\.", "/");
     }
 
-    public static int register(Element element, Method method){
+    public static int getRegister(Element element, Method method){
         HashMap<String, Descriptor> varTable = method.getVarTable();
         return varTable.get(((Operand) element).getName()).getVirtualReg();
     }
 
     public static String getArray(Element element, Method method){
-        int arrayReg = register(element, method);
+        int arrayReg = getRegister(element, method);
         Element first = ((ArrayOperand) element).getIndexOperands().get(0);
-        int firstReg = register(first, method);
+        int firstReg = getRegister(first, method);
         return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(firstReg);
     }
 }

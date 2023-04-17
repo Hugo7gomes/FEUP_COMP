@@ -45,7 +45,7 @@ public class MyJasminInstructionBuilder {
         }
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
-            int reg = MyJasminUtils.register(element, this.method);
+            int reg = MyJasminUtils.getRegister(element, this.method);
             Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
             ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
@@ -55,7 +55,7 @@ public class MyJasminInstructionBuilder {
         }
 
         if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
-            int reg = MyJasminUtils.register(element, this.method);
+            int reg = MyJasminUtils.getRegister(element, this.method);
             return MyJasminInstruction.aload(reg);
         }
 
@@ -66,7 +66,7 @@ public class MyJasminInstructionBuilder {
         ElementType type = element.getType().getTypeOfElement();
 
         if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
-            int reg = MyJasminUtils.register(element,this.method);
+            int reg = MyJasminUtils.getRegister(element,this.method);
             Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
             ElementType varType = descriptor.getVarType().getTypeOfElement();
             if (varType == ElementType.ARRAYREF){
@@ -76,7 +76,7 @@ public class MyJasminInstructionBuilder {
         }
 
         if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
-            int reg = MyJasminUtils.register(element, this.method);
+            int reg = MyJasminUtils.getRegister(element, this.method);
             return value + MyJasminInstruction.astore(reg);
         }
 
@@ -111,7 +111,7 @@ public class MyJasminInstructionBuilder {
             if(sign == OperationType.ADD || sign == OperationType.SUB || sign == OperationType.MUL || sign == OperationType.DIV){
                 String valueSign = "";
                 if(sign == OperationType.SUB) valueSign = "-";
-                int reg = MyJasminUtils.register(leftHandMostSymbol, this.method);
+                int reg = MyJasminUtils.getRegister(leftHandMostSymbol, this.method);
                 Element leftOperand = binaryExpression.getLeftOperand();
                 Element rightOperand = binaryExpression.getRightOperand();
                 if(!leftOperand.isLiteral() && rightOperand.isLiteral()){
@@ -218,13 +218,9 @@ public class MyJasminInstructionBuilder {
         String leftOperandString = loadOp(leftOperand);
         String rightOperandString = loadOp(rightOperand);
 
-        if(opType == OperationType.LTH){
-            stringBuilder.append(leftOperandString);
-        } else {
-            stringBuilder.append(leftOperandString);
-            stringBuilder.append(rightOperandString);
-            stringBuilder.append(MyJasminInstruction.arithOp(opType));
-        }
+        stringBuilder.append(leftOperandString);
+        stringBuilder.append(rightOperandString);
+        stringBuilder.append(MyJasminInstruction.arithOp(opType));
 
         return stringBuilder.toString();
     }
@@ -242,12 +238,12 @@ public class MyJasminInstructionBuilder {
     }
 
     private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
-        MyJasminInstruction.FieldInstructionType fieldInstruction;
+        String fieldInstruction;
         if(type.equals(InstructionType.GETFIELD)){
-            fieldInstruction = MyJasminInstruction.FieldInstructionType.GETFIELD;
+            fieldInstruction = "getfield";
         }
         else {
-            fieldInstruction = MyJasminInstruction.FieldInstructionType.PUTFIELD;
+            fieldInstruction = "putfield";
         }
         String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
         String fieldName = ((Operand)fieldElem).getName();

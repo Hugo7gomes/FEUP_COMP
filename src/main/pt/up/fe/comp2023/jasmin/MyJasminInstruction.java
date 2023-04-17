@@ -5,12 +5,6 @@ import org.specs.comp.ollir.OperationType;
 
 public class MyJasminInstruction {
 
-    public enum FieldInstructionType {
-        GETFIELD,
-        PUTFIELD,
-    }
-
-
     private static String registerInstruction(String instruction, int register) {
         if(register >= 0 && register <= 3) {
             return instruction + "_" + register + "\n";
@@ -106,9 +100,6 @@ public class MyJasminInstruction {
             case ANDB -> {
                 return "\tiand\n";
             }
-            case OR -> {
-                return "\tior\n";
-            }
         }
         return "";
     }
@@ -118,8 +109,8 @@ public class MyJasminInstruction {
                 + argsTypes +  returnType + "\n";
     }
 
-    public static String fieldOp(FieldInstructionType type, String className, String fieldName, String fieldType) {
-        return "\t" + type.toString().toLowerCase() + " " + className + "/" + fieldName + " " + fieldType + "\n";
+    public static String fieldOp(String type, String className, String fieldName, String fieldType) {
+        return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
 
