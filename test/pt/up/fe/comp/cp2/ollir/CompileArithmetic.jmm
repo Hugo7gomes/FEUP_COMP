@@ -1,14 +1,11 @@
-import io;
-import Other;
-// import Person;
+import Dummy;
 
-class BasicMethods extends Other {
+class NoArgsFuncCall {
 
+    public int bar(Dummy c) {
 
-    public BasicMethods func3(){
-        BasicMethods p1;
-        p1 = new BasicMethods();
-        return p1;
+        c.bar();
+
+        return 1;
     }
-
 }
