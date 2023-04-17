@@ -49,6 +49,14 @@ public class MyJasminInstruction {
         return "\tiastore\n";
     }
 
+    public static String ireturn() {
+        return "\tireturn\n";
+    }
+
+    public static String areturn() {
+        return "\tareturn\n";
+    }
+
     public static String iconst(int value) {
         if(value == -1) {
             return "\ticonst_m1\n";

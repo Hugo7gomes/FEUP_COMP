@@ -87,13 +87,16 @@ public class MyJasminInstructionBuilder {
         StringBuilder stringBuilder = new StringBuilder();
         if(!instruction.hasReturnValue()) return "\treturn\n";
         Element resultValue = instruction.getOperand();
+
         stringBuilder.append(loadOp(resultValue));
+
         Type returnType = method.getReturnType();
         if(returnType.getTypeOfElement() == ElementType.INT32 || returnType.getTypeOfElement() == ElementType.BOOLEAN){
-            stringBuilder.append("\tireturn\n");
+            stringBuilder.append(MyJasminInstruction.ireturn());
         } else {
-            stringBuilder.append("\tareturn\n");
+            stringBuilder.append(MyJasminInstruction.areturn());
         }
+
         return stringBuilder.toString();
 
     }
@@ -141,7 +144,7 @@ public class MyJasminInstructionBuilder {
                     stringBuilder.append(MyJasminInstruction.newObject(returnTypeName)).append(MyJasminInstruction.dup());
                 }
                 else {
-                    stringBuilder.append(loadOp(instruction.getListOfOperands().get(0)));
+                    stringBuilder.append(loadOp(instruction.getFirstArg()));
                     stringBuilder.append(MyJasminInstruction.newArray());
                 }
                 return stringBuilder.toString();
