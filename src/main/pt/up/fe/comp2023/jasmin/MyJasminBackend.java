@@ -33,7 +33,10 @@ public class MyJasminBackend implements JasminBackend {
             }
 
             System.out.println(jasmin);
-            return new JasminResult(ollirResult, jasmin, reports);
+
+            JasminResult jasminResult = new JasminResult(ollirResult, jasmin, reports);
+            jasminResult.run();
+            return jasminResult;
 
         } catch (OllirErrorException e){
             return new JasminResult(this.classUnit.getClassName(), null,
