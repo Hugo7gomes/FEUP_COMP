@@ -65,7 +65,7 @@ public class MyJasminInstructionBuilder {
     private String storeOp(Element element, String value){
         ElementType type = element.getType().getTypeOfElement();
 
-        if(type == ElementType.INT32 || type == ElementType.BOOLEAN || type == ElementType.STRING){
+        if(type == ElementType.INT32 || type == ElementType.BOOLEAN){
             int reg = MyJasminUtils.register(element,this.method);
             Descriptor descriptor = method.getVarTable().get(((Operand) element).getName());
             ElementType varType = descriptor.getVarType().getTypeOfElement();
@@ -75,7 +75,7 @@ public class MyJasminInstructionBuilder {
             return value + MyJasminInstruction.istore(reg);
         }
 
-        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS){
+        if(type == ElementType.ARRAYREF || type == ElementType.OBJECTREF || type == ElementType.THIS || type == ElementType.STRING){
             int reg = MyJasminUtils.register(element, this.method);
             return value + MyJasminInstruction.astore(reg);
         }
