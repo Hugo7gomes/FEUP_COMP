@@ -1,0 +1,15 @@
+
+
+class InheritedMethodCallSimple extends A {
+
+    public static void main(String[] args) {
+
+    }
+
+    public int foo() {
+        int b;
+        InheritedMethodCallSimple c;
+
+        return c.bar(10,20);
+    }
+}

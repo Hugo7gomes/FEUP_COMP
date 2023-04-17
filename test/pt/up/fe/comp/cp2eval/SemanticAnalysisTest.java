@@ -162,4 +162,11 @@ public class SemanticAnalysisTest {
                 .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/AssumeArguments.jmm"));
         TestUtils.noErrors(result);
     }
+
+    @Test
+    public void inheritedMethodCallSimple() {
+        var result = TestUtils
+                .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/InheritedMethodCallSimple.jmm"));
+        TestUtils.noErrors(result);
+    }
 }
