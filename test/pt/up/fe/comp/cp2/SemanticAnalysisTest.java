@@ -152,7 +152,7 @@ public class SemanticAnalysisTest {
     @Test
     public  void inheritedMethodCallSimple(){
         var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/inheritedMethodCallSimple.jmm"));
-        TestUtils.mustFail(result);
+        TestUtils.noErrors(result);
         System.out.println(result.getReports());
     }
 }

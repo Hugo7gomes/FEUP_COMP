@@ -100,9 +100,6 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         }
 
 
-
-
-
         //Checks if variable is an array
         if(!varType.isArray()){
             reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Array assignment variable not array"));
@@ -163,8 +160,6 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         return childType;
 
     }
-
-
 
 
     private Type dealWithAssignment(JmmNode jmmNode, String s) {
@@ -232,6 +227,7 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         //Checks if both types are imported
         else if(symbolTable.getImports().contains(varType.getName()) && symbolTable.getImports().contains(childType.getName())){
             return childType;
+        //Checks if
         }else if(childType.getName().equals("importCorrect")){
             return childType;
         }
