@@ -86,13 +86,6 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             }
         }
 
-        /*if(symbolTable.getReturnType(methodName) == null){
-            if(symbolTable.getImports().contains(classType.getName())){
-                return new Type("importCorrect", false);
-            }else{
-                return new Type("importIncorrect", false);
-            }
-        };*/
 
         return symbolTable.getReturnType(methodName);
 
