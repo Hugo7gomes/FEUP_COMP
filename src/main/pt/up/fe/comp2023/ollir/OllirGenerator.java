@@ -99,8 +99,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 codeOllir.append("ret.").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(" ");
                 codeOllir.append(code.value);
                 if(!code.value.contains(".")) {
-                    codeOllir.append(".")
-                            .append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName)));
+                    codeOllir.append(".").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName)));
                 }
                 codeOllir.append(";\n");
             }else {
@@ -194,12 +193,14 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
         String returnType = ".V";
         StringBuilder code = new StringBuilder();
+
         if(!identifierType.equals("")){
             code.append("invokevirtual(").append(identifierType);
         }else{
             code.append("invokestatic(");
             code.append(identifier.get("value"));
         }
+
         code.append(", \"").append(methodCall.get("name")).append("\"");
         if(!args.value.equals("")){
             code.append(", ").append(args.value);
@@ -210,14 +211,14 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             codeOllir.append(args.prefixCode);
             codeOllir.append(code);
             return new OllirCodeStruct();
-        }else{
-            if(ExprStmt.getJmmParent().getKind().equals("Assignment")){
-                JmmNode assignment = ExprStmt.getJmmParent();
-                returnType = getType(assignment, methodName, assignment.get("var"));
-            }
-            code.append(".").append(returnType.split("\\.")[1]);
-            return new OllirCodeStruct(args.prefixCode, code.toString());
         }
+        
+        if(ExprStmt.getJmmParent().getKind().equals("Assignment")){
+            JmmNode assignment = ExprStmt.getJmmParent();
+            returnType = getType(assignment, methodName, assignment.get("var"));
+        }
+        code.append(".").append(returnType.split("\\.")[1]);
+        return new OllirCodeStruct(args.prefixCode, code.toString());
     }
 
 
