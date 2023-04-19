@@ -1,17 +1,17 @@
+import A;
 
-class Foo extends Bar {
+class InheritedMethodCallSimple extends A{
 
     public static void main(String[] args) {
 
     }
 
-    public int test() {
-        Foo a;
+    public int foo() {
+        InheritedMethodCallSimple b;
+        A c;
+        int d;
 
-        a = this;
-        a.method();
-
-
-        return a.method();
+        d = b.test();
+        return d;
     }
 }

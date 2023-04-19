@@ -48,15 +48,12 @@ public class ProgramAnalyser extends AJmmVisitor<String, Type> {
                 }
             }
             if(!methodName.equals("main") && i == children.size() - 1 ){
-                //Problema quando retornamos coisas que temos que assumir que estão certas
-
+                //Assume return is correct
                 if(childType.getName().equals("importCorrect")){
-                    //VER ISTOOO E EXPRESSION ANALYSER LINHA 75
-                    System.out.println("aqui");
+                    return new Type("importCorrect", false);
                 }
+                //Check if the returning types match
                 else if(!childType.getName().equals(symbolTable.getReturnType(methodName).getName())){
-                    System.out.println("Child type name" + childType.getName());
-                    System.out.println("Method Name: " + methodName + " Method return type " + symbolTable.getReturnType(methodName).getName());
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Return type is incorrect"));
                 }
             }

@@ -65,11 +65,14 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
                         }
                     }
                 }
-            }//checks if current class extends a super class
+            }
             else{
+                //checks if current class extends a super class
                 if(symbolTable.getSuper() == null){
                     reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Method doesnt exist"));
+                    return new Type("importCorrect", false);
                 }else{
+                    //Assume calling method is correct
                     return new Type("importCorrect", false);
                 }
             }
@@ -83,13 +86,13 @@ public class ExpressionAnalyser extends AJmmVisitor<String, Type> {
             }
         }
 
-        if(symbolTable.getReturnType(methodName) == null){
+        /*if(symbolTable.getReturnType(methodName) == null){
             if(symbolTable.getImports().contains(classType.getName())){
                 return new Type("importCorrect", false);
             }else{
                 return new Type("importIncorrect", false);
             }
-        };
+        };*/
 
         return symbolTable.getReturnType(methodName);
 
