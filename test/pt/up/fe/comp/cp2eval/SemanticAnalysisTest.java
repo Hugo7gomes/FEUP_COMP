@@ -119,6 +119,7 @@ public class SemanticAnalysisTest {
     @Test
     public void t6CallToUndeclaredMethod() {
         var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/CallToUndeclaredMethod.jmm"));
+        System.out.println(result.getReports());
         TestUtils.mustFail(result);
     }
 
@@ -167,6 +168,20 @@ public class SemanticAnalysisTest {
     public void inheritedMethodCallSimple() {
         var result = TestUtils
                 .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/InheritedMethodCallSimple.jmm"));
+        TestUtils.noErrors(result);
+    }
+
+    @Test
+    public void varLookupLocal() {
+        var result = TestUtils
+                .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/VarLookupLocal.jmm"));
+        TestUtils.noErrors(result);
+    }
+
+    @Test
+    public void varLookupField() {
+        var result = TestUtils
+                .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/VarLookupField.jmm"));
         TestUtils.noErrors(result);
     }
 }

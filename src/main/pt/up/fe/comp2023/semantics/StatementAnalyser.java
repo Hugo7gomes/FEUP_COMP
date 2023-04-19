@@ -61,21 +61,6 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
 
         String methodName = parent.get("methodName");
 
-        //Get fields
-        List<Symbol> fields = symbolTable.getFields();
-        //Check if var is a field
-        if(fields != null){
-            for(Symbol f: fields){
-                if(f.getName().equals(var)){
-                    if(methodName.equals("main")){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
-                    }
-                    varType = f.getType();
-                    break;
-                }
-            }
-        }
-
         //Get List of local variables
         List<Symbol> locals = symbolTable.getLocalVariables(methodName);
         //check if var is a local variable
@@ -91,13 +76,32 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         //Get List of parameters of the method
         List<Symbol> parameters  = symbolTable.getParameters(methodName);
         //check if var is a parameter
-        if(parameters != null){
+        if(parameters != null && varType.getName().equals("")){
             for(Symbol p:parameters){
                 if(p.getName().equals(var)){
                     varType = p.getType();
                 }
             }
         }
+
+        //Get fields
+        List<Symbol> fields = symbolTable.getFields();
+        //Check if var is a field
+        if(fields != null &&  varType.getName().equals("")){
+            for(Symbol f: fields){
+                if(f.getName().equals(var)){
+                    if(methodName.equals("main")){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
+                    }
+                    varType = f.getType();
+                    break;
+                }
+            }
+        }
+
+
+
+
 
         //Checks if variable is an array
         if(!varType.isArray()){
@@ -181,21 +185,6 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
 
         String methodName = parent.get("methodName");
 
-        //Get fields
-        List<Symbol> fields = symbolTable.getFields();
-        //Check if var is a field
-        if(fields != null){
-            for(Symbol f: fields){
-                if(f.getName().equals(var)){
-                    if(methodName.equals("main")){
-                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
-                    }
-                    varType = f.getType();
-                    break;
-                }
-            }
-        }
-
         //Get List of local variables
         List<Symbol> locals = symbolTable.getLocalVariables(methodName);
         //check if var is a local variable
@@ -211,10 +200,24 @@ public class StatementAnalyser extends AJmmVisitor<String, Type> {
         //Get List of parameters of the method
         List<Symbol> parameters  = symbolTable.getParameters(methodName);
         //check if var is a parameter
-        if(parameters != null){
+        if(parameters != null && varType.getName().equals("")){
             for(Symbol p:parameters){
                 if(p.getName().equals(var)){
                     varType = p.getType();
+                }
+            }
+        }
+
+        //Get fields
+        List<Symbol> fields = symbolTable.getFields();
+        //Check if var is a field
+        if(fields != null &&  varType.getName().equals("")){
+            for(Symbol f: fields){
+                if(f.getName().equals(var)){
+                    if(methodName.equals("main")){
+                        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC,Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "Fields cannot be used inside static method main"));
+                    }
+                    varType = f.getType();
                     break;
                 }
             }
