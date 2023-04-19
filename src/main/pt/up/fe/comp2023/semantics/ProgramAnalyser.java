@@ -73,12 +73,11 @@ public class ProgramAnalyser extends AJmmVisitor<String, Type> {
 
 
     private Type dealWithProgram(JmmNode jmmNode, String s) {
-        reports.add(new Report(ReportType.ERROR, Stage.SEMANTIC, Integer.parseInt(jmmNode.get("lineStart")), Integer.parseInt(jmmNode.get("colStart")), "test report" ));
-        /*for(JmmNode child: jmmNode.getChildren()){
+        for(JmmNode child: jmmNode.getChildren()){
             if(child.getKind().equals("Class")){
                 visit(child,"");
             }
-        }*/
+        }
         return new Type("null", false);
     }
 
