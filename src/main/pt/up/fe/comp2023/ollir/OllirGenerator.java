@@ -266,13 +266,13 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             result.append("$").append(index).append(".").append(variableName).append(".").append(OllirAuxFunctions.getCode(new Type(jmmNode.getJmmChild(index).get("name"), jmmNode.getJmmChild(index).get("isArray").equals("true"))));
             return result.toString();
         }
-
+        /*
         for(JmmNode child: jmmNode.getJmmParent().getChildren()) {
             if (child.getKind().equals("Declaration") && child.get("value").equals(variableName)) {
                 result.append(variableName).append(".").append(OllirAuxFunctions.getCode(new Type(child.getJmmChild(0).get("name"), child.getJmmChild(0).get("isArray").equals("true"))));
                 return result.toString();
             }
-        }
+        }*/
         return "";
 
     }
