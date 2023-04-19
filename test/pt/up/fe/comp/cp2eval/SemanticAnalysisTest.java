@@ -184,4 +184,12 @@ public class SemanticAnalysisTest {
                 .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/VarLookupField.jmm"));
         TestUtils.noErrors(result);
     }
+
+    @Test
+    public void varLookupFieldMainFail() {
+        var result = TestUtils
+                .analyse(SpecsIo.getResource("pt/up/fe/comp/cp2eval/semanticanalysis/VarLookupFieldMainFail.jmm"));
+        System.out.println(result.getReports());
+        TestUtils.mustFail(result);
+    }
 }
