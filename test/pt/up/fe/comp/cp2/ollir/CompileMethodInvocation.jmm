@@ -3,7 +3,9 @@ import io;
 class A {
     int a;
 
-    public int x(int b){
+    public int x(int a){
+        int b;
+        b = 10;
         a = b;
         io.print(a);
         return a;

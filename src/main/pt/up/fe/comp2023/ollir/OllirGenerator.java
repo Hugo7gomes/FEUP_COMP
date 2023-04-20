@@ -130,13 +130,13 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithIdentifier(JmmNode jmmNode, String methodName) {
-        Type returnType = symbolTable.getReturnType(methodName);
-        String code = new String();
+        String code = "";
+        code = getType(jmmNode, methodName, jmmNode.get("value"));
         OllirCodeStruct ollirCodeStruct = isField(jmmNode, jmmNode.get("value"));
-        if(!ollirCodeStruct.value.equals("")){
+        if(!ollirCodeStruct.value.equals("") && code.equals("")){
             return ollirCodeStruct;
         }
-        code = getType(jmmNode, methodName, jmmNode.get("value"));
+
         return new OllirCodeStruct("", code.toString());
     }
 
