@@ -155,10 +155,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
         String type = getType(assignment, methodName, assignment.get("var"));
-        String varType = type.split("\\.")[1];
-        if(type.split("\\.").length == 3){
-           varType = type.split("\\.")[2];
-        }
+        String varType = type.split("\\.")[type.split("\\.").length - 1];
         codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
         if(assignment.getJmmChild(0).getKind().equals("NewObject")){
             codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
@@ -210,6 +207,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
         code.append(")");
         if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
+            String returnTypeAux = childClass(ExprStmt, methodCall.get("name"));
+            if(!returnTypeAux.equals("")){
+                returnType = "." + returnTypeAux;
+            }
             code.append(returnType).append(";\n");
             codeOllir.append(args.prefixCode);
             codeOllir.append(code);
@@ -281,6 +282,17 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     }
 
+    private String childClass(JmmNode jmmNode, String methodName) {
+        while(!jmmNode.getKind().equals("Class")){
+            jmmNode = jmmNode.getJmmParent();
+        }
+        for(JmmNode child: jmmNode.getChildren()) {
+            if (child.getKind().equals("Method") && child.get("methodName").equals(methodName)) {
+                return OllirAuxFunctions.getCode(symbolTable.getReturnType(child.get("methodName")));
+            }
+        }
+        return "";
+    }
 
     @Override
     protected void buildVisitor() {
