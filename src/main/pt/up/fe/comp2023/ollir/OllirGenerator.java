@@ -142,6 +142,14 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithAssignment(JmmNode assignment, String methodName) {
         StringBuilder code = new StringBuilder();
+        OllirCodeStruct ollirCodeField = isField(assignment, assignment.get("var"));
+        if(!ollirCodeField.value.equals("")){
+            OllirCodeStruct assignmentChild = visit(assignment.getJmmChild(0), methodName);
+            String type = ollirCodeField.value.split("\\.")[1];
+            codeOllir.append(assignmentChild.prefixCode);
+            codeOllir.append("putfield(this, ").append(assignment.get("var")).append(".").append(type).append(", ").append(assignmentChild.value).append(").V;\n");
+            return new OllirCodeStruct();
+        }
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
         String type = getType(assignment, methodName, assignment.get("var"));
@@ -214,7 +222,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         code.append(".").append(returnType.split("\\.")[1]);
         return new OllirCodeStruct(args.prefixCode, code.toString());
     }
-
 
     private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
         StringBuilder code = new StringBuilder();

@@ -1,19 +1,17 @@
-import io;
+class CompileArithmetic {
 
-class A {
-    int a;
+    public static void main(String[] args) {
 
-    public int x(){
-        //int b;
-        //a = 10;
-        //b = a;
-        //io.print(a);
-        return a;
     }
 
-    public static void main(String[] args){
-        A a;
-        a = new A();
-        a.x();
+    public int foo() {
+        int a;
+        int b;
+
+        a = 1;
+        b = 2;
+
+        return a + b;
     }
 }
+
