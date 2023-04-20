@@ -129,7 +129,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithIdentifier(JmmNode jmmNode, String methodName) {
         Type returnType = symbolTable.getReturnType(methodName);
-        StringBuilder code = new StringBuilder();
+        String code = new String();
+        code = getType(jmmNode, methodName, jmmNode.get("value"));
+        return new OllirCodeStruct("", code.toString());
+        /*
         int index;
         if((index = getParameters(methodName, jmmNode.get("value"))) != -1){
             code.append("$").append(index).append(".");
@@ -147,7 +150,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 }
             }
         }
-        return new OllirCodeStruct("", jmmNode.get("value"));
+        return new OllirCodeStruct("", jmmNode.get("value"));*/
     }
 
     private OllirCodeStruct dealWithAssignment(JmmNode assignment, String methodName) {
@@ -292,6 +295,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             }
         }
         return "";
+    }
+
+    private OllirCodeStruct isField(JmmNode jmmNode, String variableName){
+        return new OllirCodeStruct();
     }
 
     @Override

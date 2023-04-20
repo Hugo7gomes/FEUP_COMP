@@ -3,8 +3,10 @@ import io;
 class A {
     int a;
 
-    public int x(int a){
+    public int x(){
+        int b;
         a = 10;
+        b = a;
         io.print(a);
         return a;
     }
@@ -12,6 +14,6 @@ class A {
     public static void main(String[] args){
         A a;
         a = new A();
-        a.x(10);
+        a.x();
     }
 }
