@@ -1,23 +1,20 @@
-import GetterAndSetter;
-import io;
-PrintOtherClassFromParam {
-.construct PrintOtherClassFromParam().V {
-invokespecial(this, "<init>").V;
-}
+Test {
 
-.method public print(b.GetterAndSetter).i32 {
-myGetter.GetterAndSetter :=.GetterAndSetter $1.b.i32;
-content.i32 :=.i32 invokevirtual(myGetter.GetterAndSetter, "getA").i32;
-invokestatic(io, "print", content.i32).V;
-ret.i32 1.i32;
-}
-.method public static main(args.array.String).V {
-b.GetterAndSetter :=.GetterAndSetter new(GetterAndSetter).GetterAndSetter;
-invokespecial(b.GetterAndSetter, "<init>").V;
-dummy.i32 :=.i32 invokevirtual(b.GetterAndSetter, "setA", 10.i32).i32;
-c.PrintOtherClassFromParam :=.PrintOtherClassFromParam new(PrintOtherClassFromParam).PrintOtherClassFromParam;
-invokespecial(c.PrintOtherClassFromParam, "<init>").V;
-invokevirtual(c.PrintOtherClassFromParam, "print", b.GetterAndSetter).V;
-ret.V;
-}
+	.construct Test().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public static main(args.array.String).V {
+		ret.V;
+	}
+
+
+	.method public foo().i32 {
+		a.i32 :=.i32 1.i32;
+		b.i32 :=.i32 2.i32;
+
+		c.i32 :=.i32 a.i32 +.i32 b.i32;
+
+		ret.i32 c.i32;
+	}
 }

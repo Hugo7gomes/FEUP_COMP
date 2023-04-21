@@ -1,20 +1,21 @@
-import io;
-A {
-    .field private a.i32;
-    .construct A().V {
-    invokespecial(this, "<init>").V;
-    }
+Test {
 
-    .method public x().i32 {
-        a.i32 :=.i32 10.i32;
-        invokestatic(io, "print", a).V;
-        ret.i32 a;
-    }
+	.field intField.i32;
 
-    .method public static main(args.array.String).V {
-        a.A :=.A new(A).A;
-        invokespecial(a.A, "<init>").V;
-        invokevirtual(a.A, "x").V;
-        ret.V;
-    }
+	.construct Test().V {
+		invokespecial(this, "<init>").V;
+	}
+
+	.method public static main(args.array.String).V {
+		ret.V;
+	}
+
+
+	.method public foo().V {
+
+		putfield(this, intField.i32, 10.i32).V;
+		a.i32 :=.i32 getfield(this, intField.i32).i32;
+
+		ret.V;
+	}
 }

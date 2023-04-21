@@ -22,7 +22,8 @@ public class ConvertOllirToJasmin {
 
         // Super class
         // .super  <class-name>
-        this.superClass = classUnit.getSuperClass() != null ? classUnit.getSuperClass() : "java/lang/Object";
+        this.superClass = classUnit.getSuperClass() != null ?
+                MyJasminUtils.getQualifiedName(classUnit, classUnit.getSuperClass()) : "java/lang/Object";
         stringBuilder.append(".super " ).append(superClass).append("\n");
 
         // Fields

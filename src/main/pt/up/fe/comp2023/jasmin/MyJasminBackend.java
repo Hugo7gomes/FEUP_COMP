@@ -28,11 +28,9 @@ public class MyJasminBackend implements JasminBackend {
             List<Report> reports = new ArrayList<>();
 
             if(ollirResult.getConfig().getOrDefault("debug", "false").equals("true")) {
-                System.out.println("Jasmin:");
+                System.out.println("Jasmin:\n\n");
                 System.out.println(jasmin);
             }
-
-            System.out.println(jasmin);
 
             JasminResult jasminResult = new JasminResult(ollirResult, jasmin, reports);
             jasminResult.run();
