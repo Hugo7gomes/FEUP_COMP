@@ -105,9 +105,11 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             }else {
                 OllirCodeStruct code = visit(returnNode, methodName);
                 if(!symbolTable.getReturnType(methodName).getName().equals("void")) {
+                    codeOllir.append(code.prefixCode);
                     codeOllir.append("ret.").append(OllirAuxFunctions.getCode(symbolTable.getReturnType(methodName))).append(" ");
                     codeOllir.append(code.value).append(";\n");
                 }else{
+                    codeOllir.append(code.prefixCode);
                     codeOllir.append(code.value);
                 }
             }
@@ -128,41 +130,35 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithIdentifier(JmmNode jmmNode, String methodName) {
-        Type returnType = symbolTable.getReturnType(methodName);
-        StringBuilder code = new StringBuilder();
-        int index;
-        if((index = getParameters(methodName, jmmNode.get("value"))) != -1){
-            code.append("$").append(index).append(".");
-            code.append(jmmNode.get("value")).append(".").append(OllirAuxFunctions.getCode(returnType));
-            return new OllirCodeStruct("", code.toString());
-        }else{
-            JmmNode methodNode = jmmNode.getJmmParent();
-            while(!methodNode.getKind().equals("Method")){
-                methodNode = methodNode.getJmmParent();
-            }
-            for(JmmNode child: methodNode.getChildren()){
-                if(child.getKind().equals("Declaration") && child.get("value").equals(jmmNode.get("value"))){
-                    code.append(jmmNode.get("value")).append(".").append(OllirAuxFunctions.getCode(new Type(child.getJmmChild(0).get("name"), child.getJmmChild(0).get("isArray").equals("true"))));
-                    return new OllirCodeStruct("", code.toString());
-                }
-            }
+        String code = "";
+        code = getType(jmmNode, methodName, jmmNode.get("value"));
+        OllirCodeStruct ollirCodeStruct = isField(jmmNode, jmmNode.get("value"));
+        if(!ollirCodeStruct.value.equals("") && code.equals("")){
+            return ollirCodeStruct;
         }
-        return new OllirCodeStruct("", jmmNode.get("value"));
+
+        return new OllirCodeStruct("", code.toString());
     }
 
     private OllirCodeStruct dealWithAssignment(JmmNode assignment, String methodName) {
         StringBuilder code = new StringBuilder();
+        OllirCodeStruct ollirCodeField = isField(assignment, assignment.get("var"));
+        String type = getType(assignment, methodName, assignment.get("var"));
+        if(!ollirCodeField.value.equals("") && type.equals("")){
+            OllirCodeStruct assignmentChild = visit(assignment.getJmmChild(0), methodName);
+            type = ollirCodeField.value.split("\\.")[1];
+            codeOllir.append(assignmentChild.prefixCode);
+            codeOllir.append("putfield(this, ").append(assignment.get("var")).append(".").append(type).append(", ").append(assignmentChild.value).append(").V;\n");
+            return new OllirCodeStruct();
+        }
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
-        String type = getType(assignment, methodName, assignment.get("var"));
-        String varType = type.split("\\.")[1];
-        if(type.split("\\.").length == 3){
-           varType = type.split("\\.")[2];
-        }
+        String varType = type.split("\\.")[type.split("\\.").length - 1];
         codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
         if(assignment.getJmmChild(0).getKind().equals("NewObject")){
             codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
         }
+
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
 
@@ -210,6 +206,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
         code.append(")");
         if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
+            String returnTypeAux = childClass(ExprStmt, methodCall.get("name"));
+            if(!returnTypeAux.equals("")){
+                returnType = "." + returnTypeAux;
+            }
             code.append(returnType).append(";\n");
             codeOllir.append(args.prefixCode);
             codeOllir.append(code);
@@ -223,7 +223,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         code.append(".").append(returnType.split("\\.")[1]);
         return new OllirCodeStruct(args.prefixCode, code.toString());
     }
-
 
     private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
         StringBuilder code = new StringBuilder();
@@ -281,6 +280,33 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     }
 
+    private String childClass(JmmNode jmmNode, String methodName) {
+        while(!jmmNode.getKind().equals("Class")){
+            jmmNode = jmmNode.getJmmParent();
+        }
+        for(JmmNode child: jmmNode.getChildren()) {
+            if (child.getKind().equals("Method") && child.get("methodName").equals(methodName)) {
+                return OllirAuxFunctions.getCode(symbolTable.getReturnType(child.get("methodName")));
+            }
+        }
+        return "";
+    }
+
+    private OllirCodeStruct isField(JmmNode jmmNode, String variableName){
+        while(!jmmNode.getKind().equals("Class")){
+            jmmNode = jmmNode.getJmmParent();
+        }
+        for(JmmNode child: jmmNode.getChildren()) {
+            if (child.getKind().equals("Declaration") && child.get("value").equals(variableName)) {
+                String temp = nextTemp();
+                StringBuilder prefixCode = new StringBuilder();
+                String type = OllirAuxFunctions.getCode(new Type(child.getJmmChild(0).get("name"), child.getJmmChild(0).get("isArray").equals("true")));
+                prefixCode.append(temp).append(".").append(type).append(" :=.").append(type).append(" getfield(this, ").append(variableName).append(".").append(type).append(").").append(type).append(";\n");
+                return new OllirCodeStruct(prefixCode.toString(), temp + "." + type);
+            }
+        }
+        return new OllirCodeStruct();
+    }
 
     @Override
     protected void buildVisitor() {
