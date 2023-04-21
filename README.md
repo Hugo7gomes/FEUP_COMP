@@ -47,4 +47,6 @@ In order for the test class to find your implementations for the stages, it uses
 During the development of your compiler you will update this file in order to setup the classes that implement each of the compilation stages.
 
 ### Team members
-João Moreira
+António Ferreira - up202004735
+Hugo Gomes - up202004343
+João Moreira - up202003550
