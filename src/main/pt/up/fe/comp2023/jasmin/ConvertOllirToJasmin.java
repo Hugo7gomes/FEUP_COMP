@@ -22,8 +22,7 @@ public class ConvertOllirToJasmin {
 
         // Super class
         // .super  <class-name>
-        this.superClass = classUnit.getSuperClass() != null ?
-                MyJasminUtils.getQualifiedName(classUnit, classUnit.getSuperClass()) : "java/lang/Object";
+        this.superClass = classUnit.getSuperClass() != null ? classUnit.getSuperClass() : "java/lang/Object";
         stringBuilder.append(".super " ).append(superClass).append("\n");
 
         // Fields
@@ -47,23 +46,22 @@ public class ConvertOllirToJasmin {
 
     public String buildField(Field field){
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(".field ");
 
         // Field Access
         AccessModifiers accessModifier = field.getFieldAccessModifier();
-        StringBuilder access = new StringBuilder();
 
         if(accessModifier != AccessModifiers.DEFAULT){
-            access.append(accessModifier.name().toLowerCase()).append(" ");
+            stringBuilder.append(accessModifier.name().toLowerCase()).append(" ");
         }
 
         if (field.isStaticField()) {
-            access.append("static ");
+            stringBuilder.append("static ");
         }
         if (field.isFinalField()) {
-            access.append("final ");
+            stringBuilder.append("final ");
         }
 
-        stringBuilder.append(".field " ).append(access);
 
         // Field Name
         stringBuilder.append(field.getFieldName()).append(" ");
@@ -80,20 +78,20 @@ public class ConvertOllirToJasmin {
 
         // Method Access
         AccessModifiers accessModifier = method.getMethodAccessModifier();
-        StringBuilder access = new StringBuilder();
 
         if(accessModifier == AccessModifiers.DEFAULT) {
             stringBuilder.append(".method public <init>(");
 
         } else {
-            access.append(accessModifier.name().toLowerCase()).append(" ");
+
+            stringBuilder.append(".method ");
+            stringBuilder.append(accessModifier.name().toLowerCase()).append(" ");
             if (method.isStaticMethod()) {
-                access.append("static ");
+                stringBuilder.append("static ");
             }
             if (method.isFinalMethod()) {
-                access.append("final ");
+                stringBuilder.append("final ");
             }
-            stringBuilder.append(".method " ).append(access);
 
             // Method Name
             stringBuilder.append(method.getMethodName()).append("(");
