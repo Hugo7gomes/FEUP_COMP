@@ -4,7 +4,6 @@ import org.specs.comp.ollir.*;
 import pt.up.fe.specs.util.exceptions.NotImplementedException;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static java.lang.Integer.parseInt;
@@ -18,7 +17,7 @@ public class MyJasminInstructionBuilder {
         this.superClass = superClass;
     }
 
-    //method to build a jasmin instruction
+    // Method to build a jasmin instruction
     public String buildInstruction(Instruction instruction){
         InstructionType inst = instruction.getInstType();
         String ret = "";
@@ -35,8 +34,8 @@ public class MyJasminInstructionBuilder {
         return ret;
     }
 
-
-
+    // Generates the Jasmin instruction for loading a value from a given element, based on its type.
+    // Throws a NotImplementedException if the element's type is not supported.
     private String loadOp(Element element) {
         ElementType type = element.getType().getTypeOfElement();
 
@@ -62,6 +61,8 @@ public class MyJasminInstructionBuilder {
         throw new NotImplementedException(element);
     }
 
+    // Generates the Jasmin instruction for storing a value into a given element, based on its type.
+    // Throws a NotImplementedException if the element's type is not supported.
     private String storeOp(Element element, String value){
         ElementType type = element.getType().getTypeOfElement();
 
@@ -83,6 +84,29 @@ public class MyJasminInstructionBuilder {
         throw new NotImplementedException(element);
     }
 
+    // Generates the Jasmin instruction for accessing a field of a class,
+    // based on the given field element, class element, and instruction type (GETFIELD or PUTFIELD).
+    // Returns the generated instruction as a string.
+    // Uses MyJasminUtils to obtain the field's type, class name, and qualified name.
+    private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
+        String fieldInstruction, inst;
+        if(type.equals(InstructionType.GETFIELD)){
+            fieldInstruction = "getfield";
+        }
+        else {
+            fieldInstruction = "putfield";
+        }
+
+        String fieldType = MyJasminUtils.getType(method.getOllirClass(), fieldElem.getType());
+        String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
+        String fieldName = ((Operand)fieldElem).getName();
+
+        inst = MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);
+
+        return inst;
+    }
+
+    // Builds the Jasmin instruction for returning a value from a method
     private String buildReturn(ReturnInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         if(!instruction.hasReturnValue()) return "\treturn\n";
@@ -100,6 +124,8 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
 
     }
+
+    // Builds the Jasmin instruction for assigning a value to a variable, based on the right-hand side expression
     private String buildAssign(AssignInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -140,18 +166,23 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
+    // Builds the Jasmin code for a CALL instruction based on the invocation type.
     private String buildCall(CallInstruction instruction){
-        switch (instruction.getInvocationType()) {
+
+        CallType invokeType = instruction.getInvocationType();
+        String inst;
+        switch (invokeType) {
             case NEW -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 ElementType returnType = instruction.getReturnType().getTypeOfElement();
                 if(returnType != ElementType.ARRAYREF){
                     String returnTypeName = ((ClassType)instruction.getReturnType()).getName();
-                    stringBuilder.append(MyJasminInstruction.newObject(returnTypeName)).append(MyJasminInstruction.dup());
+                    inst = MyJasminInstruction.newObject(returnTypeName);
+                    stringBuilder.append(inst).append(MyJasminInstruction.dup());
                 }
                 else {
-                    stringBuilder.append(loadOp(instruction.getFirstArg()));
-                    stringBuilder.append(MyJasminInstruction.newArray());
+                    inst = MyJasminInstruction.newArray();
+                    stringBuilder.append(loadOp(instruction.getFirstArg())).append(inst);
                 }
                 return stringBuilder.toString();
             }
@@ -166,14 +197,15 @@ public class MyJasminInstructionBuilder {
 
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
 
-                Type returnType = instruction.getReturnType();
-
                 ArrayList<Element> params = instruction.getListOfOperands();
                 for (Element param : params) {
                     stringBuilder.append(loadOp(param));
                 }
 
-                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName,MyJasminUtils.argTypes(params, this.method), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
+                inst = MyJasminInstruction.invokeOp(callType.toString(), className, methodName,MyJasminUtils.argTypes(params, this.method), returnType);
+
+                stringBuilder.append(inst);
                 return stringBuilder.toString();
             }
 
@@ -202,9 +234,12 @@ public class MyJasminInstructionBuilder {
                 className = MyJasminUtils.getQualifiedName(method.getOllirClass(), classNameAux);
 
                 String methodName = ((LiteralElement)instruction.getSecondArg()).getLiteral().replace("\"", "");
-                Type returnType = instruction.getReturnType();
+                String paramTypes = MyJasminUtils.argTypes(params, this.method);
+                String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
 
-                stringBuilder.append(MyJasminInstruction.invokeOp(callType, className, methodName, MyJasminUtils.argTypes(params, this.method), MyJasminUtils.getType(method.getOllirClass(), returnType)));
+                inst = MyJasminInstruction.invokeOp(callType.toString(), className, methodName, paramTypes, returnType);
+
+                stringBuilder.append(inst);
 
                 return stringBuilder.toString();
             }
@@ -212,6 +247,8 @@ public class MyJasminInstructionBuilder {
         }
     }
 
+    // Builds a binary operation instruction by loading the left and right operands, and applying the corresponding
+    // arithmetic operator to them.
     private String buildBinaryOp (BinaryOpInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element leftOperand = instruction.getLeftOperand();
@@ -223,11 +260,14 @@ public class MyJasminInstructionBuilder {
 
         stringBuilder.append(leftOperandString);
         stringBuilder.append(rightOperandString);
-        stringBuilder.append(MyJasminInstruction.arithOp(opType));
+
+        String inst = MyJasminInstruction.arithOp(opType);
+        stringBuilder.append(inst);
 
         return stringBuilder.toString();
     }
 
+    // Builds a string representation of a unary operation instruction, which performs a unary operation on an operand.
     private String buildUnaryOp(UnaryOpInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Element operand = instruction.getOperand();
@@ -240,25 +280,14 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    private String fieldOp(Element fieldElem, Element classElem, InstructionType type){
-        String fieldInstruction;
-        if(type.equals(InstructionType.GETFIELD)){
-            fieldInstruction = "getfield";
-        }
-        else {
-            fieldInstruction = "putfield";
-        }
-        String className = MyJasminUtils.getQualifiedName(method.getOllirClass(),((ClassType)classElem.getType()).getName());
-        String fieldName = ((Operand)fieldElem).getName();
-        String fieldType = MyJasminUtils.getType(method.getOllirClass(), fieldElem.getType());
-        return MyJasminInstruction.fieldOp(fieldInstruction, className, fieldName, fieldType);
-    }
-
+    // Builds the Jasmin code for a PutFieldInstruction.
     private String buildPutField(PutFieldInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
+
         Element classElem = instruction.getFirstOperand();
         Element fieldElem = instruction.getSecondOperand();
         Element valueElem = instruction.getThirdOperand();
+
         stringBuilder.append(loadOp(classElem));
         stringBuilder.append(loadOp(valueElem));
         stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.PUTFIELD));
@@ -266,17 +295,20 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
+    // Builds the Jasmin code for a GetFieldInstruction.
     private String buildGetField(GetFieldInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
+
         Element classElem = instruction.getFirstOperand();
         Element fieldElem = instruction.getSecondOperand();
+
         stringBuilder.append(loadOp(classElem));
         stringBuilder.append(fieldOp(fieldElem, classElem, InstructionType.GETFIELD));
 
         return stringBuilder.toString();
     }
 
-
+    // Builds the Jasmin instructions for a SingleOpInstruction
     private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);

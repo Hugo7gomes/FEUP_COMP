@@ -24,7 +24,7 @@ public class MyJasminBackend implements JasminBackend {
             this.classUnit.buildCFGs();
             this.classUnit.checkMethodLabels();
 
-            String jasmin = new ConvertOllirToJasmin(this.classUnit).toJasmin();
+            String jasmin = new MyOllirToJasminConverter(this.classUnit).toJasmin();
             List<Report> reports = new ArrayList<>();
 
             if(ollirResult.getConfig().getOrDefault("debug", "false").equals("true")) {

@@ -15,6 +15,7 @@ public class MyJasminInstruction {
     public static String pop() {
         return "\tpop\n";
     }
+
     public static String dup() {
         return "\tdup\n";
     }
@@ -66,9 +67,6 @@ public class MyJasminInstruction {
         }
         return "\tldc " + value + "\n";
     }
-    public static String arrayLength() {
-        return "\tarraylength\n";
-    }
 
     public static String newArray() {
         return "\tnewarray int\n";
@@ -81,7 +79,6 @@ public class MyJasminInstruction {
     public static String iinc(int register, String value) {
         return "\tiinc " + register + " " + value + "\n";
     }
-
 
     public static String arithOp(OperationType op) {
         switch (op) {
@@ -104,14 +101,12 @@ public class MyJasminInstruction {
         return "";
     }
 
-    public static String invokeOp(CallType callType, String className, String methodName, String argsTypes, String returnType) {
-        return "\t" + callType.toString() + " " + className + "/" + methodName
+    public static String invokeOp(String type, String className, String methodName, String argsTypes, String returnType) {
+        return "\t" + type + " " + className + "/" + methodName
                 + argsTypes +  returnType + "\n";
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
-
-
 }

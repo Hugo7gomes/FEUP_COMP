@@ -1,15 +1,15 @@
 package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.*;
-import java.util.HashMap;
+
 import java.util.stream.Collectors;
 
-public class ConvertOllirToJasmin {
+public class MyOllirToJasminConverter {
 
     private final ClassUnit classUnit;
     private String superClass;
 
-    public ConvertOllirToJasmin(ClassUnit classUnit) {
+    public MyOllirToJasminConverter(ClassUnit classUnit) {
         this.classUnit = classUnit;
     }
     public String toJasmin() {
