@@ -102,23 +102,29 @@ public class MyJasminInstructionBuilder {
     }
     private String buildAssign(AssignInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
+
         Element leftHandMostSymbol = instruction.getDest();
         Instruction rightHandMostSymbol = instruction.getRhs();
+        InstructionType instType = rightHandMostSymbol.getInstType();
 
-        if(rightHandMostSymbol.getInstType() == InstructionType.BINARYOPER){
+        if(instType == InstructionType.BINARYOPER){
             BinaryOpInstruction binaryExpression = (BinaryOpInstruction) rightHandMostSymbol;
             OperationType sign = binaryExpression.getOperation().getOpType();
+
             if(sign == OperationType.ADD || sign == OperationType.SUB || sign == OperationType.MUL || sign == OperationType.DIV){
                 String valueSign = "";
                 if(sign == OperationType.SUB) valueSign = "-";
                 int reg = MyJasminUtils.getRegister(leftHandMostSymbol, this.method);
+
                 Element leftOperand = binaryExpression.getLeftOperand();
                 Element rightOperand = binaryExpression.getRightOperand();
+
                 if(!leftOperand.isLiteral() && rightOperand.isLiteral()){
                     if(Objects.equals(((Operand) leftOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
                         String value = valueSign + ((LiteralElement) rightOperand).getLiteral();
                         return MyJasminInstruction.iinc(reg, value);
                     }
+
                 } else if (leftOperand.isLiteral() && !rightOperand.isLiteral()){
                     if(Objects.equals(((Operand) rightOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
                         String value = valueSign + ((LiteralElement) leftOperand).getLiteral();
@@ -127,10 +133,10 @@ public class MyJasminInstructionBuilder {
                 }
             }
         }
-        String rightHandMostSymbolString = buildInstruction(rightHandMostSymbol);
-        String res = storeOp(leftHandMostSymbol, rightHandMostSymbolString);
-        stringBuilder.append(res);
 
+        String rightHandMostSymbolString = buildInstruction(rightHandMostSymbol);
+        String result = storeOp(leftHandMostSymbol, rightHandMostSymbolString);
+        stringBuilder.append(result);
         return stringBuilder.toString();
     }
 
@@ -148,9 +154,6 @@ public class MyJasminInstructionBuilder {
                     stringBuilder.append(MyJasminInstruction.newArray());
                 }
                 return stringBuilder.toString();
-            }
-            case arraylength -> {
-                return loadOp(instruction.getFirstArg()) + MyJasminInstruction.arrayLength();
             }
 
             case invokestatic -> {
