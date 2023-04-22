@@ -14,4 +14,3 @@ class CompileArithmetic {
         return a + b;
     }
 }
-
