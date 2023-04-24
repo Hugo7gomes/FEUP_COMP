@@ -189,7 +189,6 @@ public class MyJasminInstructionBuilder {
 
             case invokestatic -> {
                 StringBuilder stringBuilder = new StringBuilder();
-                CallType callType = instruction.getInvocationType();
 
                 Operand operand = (Operand) instruction.getFirstArg();
                 String classNameAux = operand.getName();
@@ -203,7 +202,7 @@ public class MyJasminInstructionBuilder {
                 }
 
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
-                inst = MyJasminInstruction.invokeOp(callType.toString(), className, methodName,MyJasminUtils.argTypes(params, this.method), returnType);
+                inst = MyJasminInstruction.invokeStaticOp(className, methodName,MyJasminUtils.argTypes(params, this.method), returnType);
 
                 stringBuilder.append(inst);
                 return stringBuilder.toString();
@@ -237,7 +236,9 @@ public class MyJasminInstructionBuilder {
                 String paramTypes = MyJasminUtils.argTypes(params, this.method);
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
 
-                inst = MyJasminInstruction.invokeOp(callType.toString(), className, methodName, paramTypes, returnType);
+                if(callType == CallType.invokespecial)
+                    inst = MyJasminInstruction.invokeSpecialOp(className, methodName, paramTypes, returnType);
+                else inst = MyJasminInstruction.invokeVirtualOp(className, methodName, paramTypes, returnType);
 
                 stringBuilder.append(inst);
 
@@ -313,4 +314,5 @@ public class MyJasminInstructionBuilder {
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);
     }
+
 }

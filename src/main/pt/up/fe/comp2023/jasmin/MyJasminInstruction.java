@@ -101,12 +101,21 @@ public class MyJasminInstruction {
         return "";
     }
 
-    public static String invokeOp(String type, String className, String methodName, String argsTypes, String returnType) {
-        return "\t" + type + " " + className + "/" + methodName
-                + argsTypes +  returnType + "\n";
+    public static String invokeStaticOp(String className, String methodName, String argsTypes, String returnType) {
+        return "\tinvokestatic " + className + "/" + methodName + argsTypes +  returnType + "\n";
+    }
+
+    public static String invokeVirtualOp(String className, String methodName, String argsTypes, String returnType) {
+        return "\tinvokevirtual " + className + "/" + methodName + argsTypes +  returnType + "\n";
+    }
+
+    public static String invokeSpecialOp(String className, String methodName, String argsTypes, String returnType) {
+        return "\tinvokespecial " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
+
+
 }
