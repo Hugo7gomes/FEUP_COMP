@@ -49,5 +49,24 @@ public class OllirAuxFunctions {
         return "t" + count++;
     }
 
-
+    public static String operatorType(String operator){
+        switch (operator){
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+                return ".i32";
+            case "&&":
+            case "||":
+            case "<":
+            case ">":
+            case "<=":
+            case ">=":
+            case "==":
+            case "!=":
+                return ".bool";
+            default:
+                return "unknown";
+        }
+    }
 }
