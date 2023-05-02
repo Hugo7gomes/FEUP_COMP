@@ -153,7 +153,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
-        String varType = type.split("\\.")[type.split("\\.").length - 1];
+        String varType = type.split("\\.", 2)[1];
         codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
         if(assignment.getJmmChild(0).getKind().equals("NewObject")){
             codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
@@ -230,6 +230,17 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         return new OllirCodeStruct("", code.toString());
     }
 
+    private OllirCodeStruct dealWithNewIntArray(JmmNode jmmNode, String s) {
+        StringBuilder code = new StringBuilder();
+        String typeParant = getType(jmmNode.getJmmParent(), s, jmmNode.getJmmParent().get("var"));
+        String type =  "." + typeParant.split("\\.")[2];
+        StringBuilder prefixCode = new StringBuilder();
+        String temp = nextTemp();
+        OllirCodeStruct ollirCodeStruct = visit(jmmNode.getJmmChild(0), s);
+        prefixCode.append(temp).append(type).append(" :=").append(type).append(" ").append(ollirCodeStruct.value).append(";\n");
+        code.append("new(array, ").append(temp).append(type).append(").array").append(type);
+        return new OllirCodeStruct(prefixCode.toString(), code.toString());
+    }
 
     public String getCode() {
         return codeOllir.toString();
@@ -315,6 +326,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("ExprStmt", this::dealWithExprStmt);
         addVisit("MethodCall", this::dealWithExprStmt);
         addVisit("NewObject", this::dealWithNewObject);
+        addVisit("NewIntArray", this::dealWithNewIntArray);
     }
 }
 
