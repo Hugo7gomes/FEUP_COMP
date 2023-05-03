@@ -212,8 +212,8 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             }
             code.append(returnType).append(";\n");
             codeOllir.append(args.prefixCode);
-            codeOllir.append(code);
-            return new OllirCodeStruct();
+            //codeOllir.append(code);
+            return new OllirCodeStruct("", code.toString());
         }
         
         if(ExprStmt.getJmmParent().getKind().equals("Assignment")){
