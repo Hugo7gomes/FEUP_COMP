@@ -293,7 +293,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithArrayAssignment(JmmNode jmmNode, String s) {
-        StringBuilder code = new StringBuilder();
         OllirCodeStruct index = visit(jmmNode.getJmmChild(0), s);
         OllirCodeStruct value = visit(jmmNode.getJmmChild(1), s);
         String type = extractType(value.value);
@@ -332,10 +331,13 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         String tempIndex = nextTemp() + type;
         codeOllir.append(tempIndex)
                 .append(" :=")
-                .append(type)
-                .append(" ")
-                .append(index.value.split("\\.")[0])
-                .append("[")
+                .append(type).append(" ");
+        if(index.value.contains("$")){
+            codeOllir.append(index.value.split("\\.")[1]);
+        }else{
+            codeOllir.append(index.value.split("\\.")[0]);
+        }
+        codeOllir.append("[")
                 .append(tempArray)
                 .append("]")
                 .append(type)
