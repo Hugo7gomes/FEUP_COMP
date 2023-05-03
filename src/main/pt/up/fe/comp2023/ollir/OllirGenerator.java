@@ -212,9 +212,15 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             if(!returnTypeAux.equals("")){
                 returnType = "." + returnTypeAux;
             }
-            code.append(returnType).append(";\n");
+            code.append(returnType);
+            if(ExprStmt.getJmmParent().getKind().equals("Indexing")){
+                codeOllir.append(args.prefixCode);
+                return new OllirCodeStruct("", code.toString());
+            }
+            code.append(";\n");
             codeOllir.append(args.prefixCode);
             codeOllir.append(code);
+
             return new OllirCodeStruct();
         }
         
@@ -240,7 +246,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         String temp = nextTemp();
         OllirCodeStruct ollirCodeStruct = visit(jmmNode.getJmmChild(0), s);
         prefixCode.append(temp).append(type).append(" :=").append(type).append(" ").append(ollirCodeStruct.value).append(";\n");
-        code.append("new(array, ").append(temp).append(type).append(").array").append(type);
+        code.append("new(array, ").append(temp).append(type).append(")").append(type);
         return new OllirCodeStruct(prefixCode.toString(), code.toString());
     }
 
@@ -284,7 +290,58 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 .append(").i32;\n");
 
         return new OllirCodeStruct(code.toString(), temp);
+    }
 
+    private OllirCodeStruct dealWithArrayAssignment(JmmNode jmmNode, String s) {
+        StringBuilder code = new StringBuilder();
+        OllirCodeStruct index = visit(jmmNode.getJmmChild(0), s);
+        OllirCodeStruct value = visit(jmmNode.getJmmChild(1), s);
+        String type = extractType(value.value);
+        String nextTemp = nextTemp() + "." + type;
+        codeOllir.append(nextTemp)
+                .append(" :=.")
+                .append(type)
+                .append(" ")
+                .append(index.value).append(";\n");
+
+        codeOllir.append(jmmNode.get("var"))
+                .append("[")
+                .append(nextTemp)
+                .append("].")
+                .append(type)
+                .append(" :=.")
+                .append(type)
+                .append(" ")
+                .append(value.value)
+                .append(";\n");
+
+        return new OllirCodeStruct();
+    }
+
+    private OllirCodeStruct dealWithIndexing(JmmNode jmmNode, String s) {
+        OllirCodeStruct array = visit(jmmNode.getJmmChild(1), s);
+        String tempArray = nextTemp() + ".i32";
+        codeOllir.append(array.prefixCode);
+        codeOllir.append(tempArray)
+                .append(" :=.i32 ")
+                .append(array.value)
+                .append(";\n");
+        OllirCodeStruct index = visit(jmmNode.getJmmChild(0), s);
+        codeOllir.append(index.prefixCode);
+        String type = "." + extractType(index.value).split("\\.")[1];
+        String tempIndex = nextTemp() + type;
+        codeOllir.append(tempIndex)
+                .append(" :=")
+                .append(type)
+                .append(" ")
+                .append(index.value.split("\\.")[0])
+                .append("[")
+                .append(tempArray)
+                .append("]")
+                .append(type)
+                .append(";\n");
+
+        return new OllirCodeStruct("", tempIndex);
     }
 
     public String getCode() {
@@ -383,8 +440,8 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("IfElseStmt", this::dealWithIfElseStmt);
         addVisit("Stmt", this::dealWithStmt);
         addVisit("Length", this::dealWithLength);
+        addVisit("ArrayAssignment", this::dealWithArrayAssignment);
+        addVisit("Indexing", this::dealWithIndexing);
     }
-
-
 }
 
