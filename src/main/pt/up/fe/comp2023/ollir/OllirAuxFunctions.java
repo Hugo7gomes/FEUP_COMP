@@ -69,4 +69,27 @@ public class OllirAuxFunctions {
                 return "unknown";
         }
     }
+
+    public static String oppositeOperator(String operator){
+        switch (operator){
+            case "<":
+                return ">=";
+            case ">":
+                return "<=";
+            case "<=":
+                return ">";
+            case ">=":
+                return "<";
+            case "==":
+                return "!=";
+            case "!=":
+                return "==";
+            case "&&":
+                return "||";
+            case "||":
+                return "&&";
+            default:
+                return "unknown";
+        }
+    }
 }

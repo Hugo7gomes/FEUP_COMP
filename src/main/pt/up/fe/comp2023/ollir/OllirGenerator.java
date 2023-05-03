@@ -9,8 +9,7 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 
 import java.util.List;
 
-import static pt.up.fe.comp2023.ollir.OllirAuxFunctions.nextTemp;
-import static pt.up.fe.comp2023.ollir.OllirAuxFunctions.operatorType;
+import static pt.up.fe.comp2023.ollir.OllirAuxFunctions.*;
 
 public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     private final SymbolTable symbolTable;
@@ -131,14 +130,14 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithIdentifier(JmmNode jmmNode, String methodName) {
-        String code = "";
+        String code;
         code = getType(jmmNode, methodName, jmmNode.get("value"));
         OllirCodeStruct ollirCodeStruct = isField(jmmNode, jmmNode.get("value"));
         if(!ollirCodeStruct.value.equals("") && code.equals("")){
             return ollirCodeStruct;
         }
 
-        return new OllirCodeStruct("", code.toString());
+        return new OllirCodeStruct("", code);
     }
 
     private OllirCodeStruct dealWithAssignment(JmmNode assignment, String methodName) {
@@ -164,11 +163,20 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithBinaryOp(JmmNode jmmNode, String aux) {
+
         StringBuilder code = new StringBuilder();
         OllirCodeStruct ollirCodeLhs = visit(jmmNode.getJmmChild(0), aux);
         OllirCodeStruct ollirCodeRhs = visit(jmmNode.getJmmChild(1), aux);
         String type = operatorType(jmmNode.get("op"));
-        String operator = jmmNode.get("op") + type;
+        String operator;
+        if(jmmNode.getJmmParent().getKind().equals("WhileStmt")){
+            operator = oppositeOperator(jmmNode.get("op")) + type;
+        }else{
+            operator = jmmNode.get("op") + type;
+        }
+
+
+
         StringBuilder temp = new StringBuilder(nextTemp()).append(type);
         code.append(ollirCodeLhs.prefixCode);
         code.append(ollirCodeRhs.prefixCode);
@@ -251,7 +259,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithIfElseStmt(JmmNode jmmNode, String s) {
-        StringBuilder code = new StringBuilder();
         OllirCodeStruct condition = visit(jmmNode.getJmmChild(0), s);
 
         codeOllir.append(condition.prefixCode);
@@ -267,7 +274,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 .append("THEN")
                 .append(":\n");
 
-        OllirCodeStruct thenStmt = visit(jmmNode.getJmmChild(1), s);
+        visit(jmmNode.getJmmChild(1), s);
         codeOllir.append(elseStmt.prefixCode);
 
         codeOllir.append("ENDIF")
@@ -277,7 +284,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithStmt(JmmNode jmmNode, String s) {
-        return visit(jmmNode.getJmmChild(0), s);
+        for(JmmNode child : jmmNode.getChildren()){
+            visit(child, s);
+        }
+        return new OllirCodeStruct();
     }
 
     private OllirCodeStruct dealWithLength(JmmNode jmmNode, String s) {
@@ -344,6 +354,24 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 .append(";\n");
 
         return new OllirCodeStruct("", tempIndex);
+    }
+
+    private OllirCodeStruct dealWithWhileStmt(JmmNode jmmNode, String s) {
+        OllirCodeStruct condition = visit(jmmNode.getJmmChild(0), s);
+        codeOllir.append(condition.prefixCode);
+        codeOllir.append("WHILE")
+                .append(":\n")
+                .append("if (")
+                .append(condition.value)
+                .append(") goto ").append("ENDWHILE").append(";\n");
+
+        visit(jmmNode.getJmmChild(1), s);
+        codeOllir.append("goto ")
+                .append("WHILE")
+                .append(";\n")
+                .append("ENDWHILE")
+                .append(":\n");
+        return new OllirCodeStruct();
     }
 
     public String getCode() {
@@ -444,6 +472,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("Length", this::dealWithLength);
         addVisit("ArrayAssignment", this::dealWithArrayAssignment);
         addVisit("Indexing", this::dealWithIndexing);
+        addVisit("WhileStmt", this::dealWithWhileStmt);
     }
 }
 
