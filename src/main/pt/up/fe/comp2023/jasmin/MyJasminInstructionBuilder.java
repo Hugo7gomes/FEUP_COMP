@@ -30,6 +30,8 @@ public class MyJasminInstructionBuilder {
             case UNARYOPER -> ret = buildUnaryOp((UnaryOpInstruction) instruction);
             case BINARYOPER -> ret = buildBinaryOp((BinaryOpInstruction) instruction);
             case NOPER -> ret = buildSingleOp((SingleOpInstruction) instruction);
+            case GOTO -> ret = buildGoto((GotoInstruction) instruction);
+            case BRANCH -> ret = buildBranch((CondBranchInstruction) instruction);
         }
         return ret;
     }
@@ -313,6 +315,33 @@ public class MyJasminInstructionBuilder {
     private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);
+    }
+
+    private String buildGoto(GotoInstruction instruction){
+        return MyJasminInstruction.goTo(instruction.getLabel());
+    }
+
+    private String buildBranch(CondBranchInstruction instruction){
+        StringBuilder stringBuilder = new StringBuilder();
+        Instruction cond = instruction.getCondition();
+        String label = instruction.getLabel();
+        InstructionType type = cond.getInstType();
+
+        if(type == InstructionType.BINARYOPER){
+            BinaryOpInstruction binaryOp = (BinaryOpInstruction) cond;
+            Element leftOperand = binaryOp.getLeftOperand();
+            Element rightOperand = binaryOp.getRightOperand();
+            OperationType opType = binaryOp.getOperation().getOpType();
+
+            String leftOperandString = loadOp(leftOperand);
+            String rightOperandString = loadOp(rightOperand);
+
+            stringBuilder.append(leftOperandString);
+            stringBuilder.append(rightOperandString);
+
+        }
+
+        return stringBuilder.toString();
     }
 
 }

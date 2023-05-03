@@ -117,5 +117,9 @@ public class MyJasminInstruction {
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
+    public static String goTo(String label){
+        return "\tgoto " + label + "\n";
+    }
+
 
 }
