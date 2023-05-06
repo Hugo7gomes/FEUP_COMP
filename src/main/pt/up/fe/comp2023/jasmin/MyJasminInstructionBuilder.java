@@ -175,6 +175,9 @@ public class MyJasminInstructionBuilder {
         CallType invokeType = instruction.getInvocationType();
         String inst;
         switch (invokeType) {
+            case arraylength -> {
+                return loadOp(instruction.getFirstArg()) + MyJasminInstruction.arrayLength();
+            }
             case NEW -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 ElementType returnType = instruction.getReturnType().getTypeOfElement();
