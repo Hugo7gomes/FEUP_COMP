@@ -115,8 +115,8 @@ public class MyOllirToJasminConverter {
 
         // Method Stack and Local Limits
         if(method.getMethodAccessModifier() != AccessModifiers.DEFAULT){
-            stringBuilder.append("\t.limit stack 99\n");
-            stringBuilder.append("\t.limit locals 99\n");
+            stringBuilder.append("\t.limit stack ").append(MyJasminInstruction.limitController.getStackLimit()).append("\n");
+            stringBuilder.append("\t.limit locals ").append(MyJasminInstruction.limitController.getLocalsLimit()).append("\n");
         }
 
         // Method Instructions

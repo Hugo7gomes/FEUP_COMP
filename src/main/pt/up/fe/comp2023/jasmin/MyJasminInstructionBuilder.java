@@ -205,7 +205,8 @@ public class MyJasminInstructionBuilder {
                 }
 
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
-                inst = MyJasminInstruction.invokeStaticOp(className, methodName,MyJasminUtils.argTypes(params, this.method), returnType);
+                inst = MyJasminInstruction.invokeStaticOp(className, methodName,
+                        MyJasminUtils.argTypes(params, this.method), returnType, params.size());
 
                 stringBuilder.append(inst);
                 return stringBuilder.toString();
@@ -240,8 +241,8 @@ public class MyJasminInstructionBuilder {
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
 
                 if(callType == CallType.invokespecial)
-                    inst = MyJasminInstruction.invokeSpecialOp(className, methodName, paramTypes, returnType);
-                else inst = MyJasminInstruction.invokeVirtualOp(className, methodName, paramTypes, returnType);
+                    inst = MyJasminInstruction.invokeSpecialOp(className, methodName, paramTypes, returnType, params.size());
+                else inst = MyJasminInstruction.invokeVirtualOp(className, methodName, paramTypes, returnType, params.size());
 
                 stringBuilder.append(inst);
 

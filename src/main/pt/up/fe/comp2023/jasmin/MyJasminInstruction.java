@@ -5,6 +5,8 @@ import org.specs.comp.ollir.OperationType;
 
 public class MyJasminInstruction {
 
+    public static MyLimitController limitController = new MyLimitController();
+
     private static String registerInstruction(String instruction, int register) {
         if(register >= 0 && register <= 3) {
             return instruction + "_" + register + "\n";
@@ -13,34 +15,42 @@ public class MyJasminInstruction {
     }
 
     public static String pop() {
+        limitController.updateStack(-1);
         return "\tpop\n";
     }
 
     public static String dup() {
+        limitController.updateStack(1);
         return "\tdup\n";
     }
 
     public static String iload(int register) {
+        limitController.updateStack(1);
         return registerInstruction("\tiload", register);
     }
 
     public static String istore(int register) {
+        limitController.updateStack(-1);
         return registerInstruction("\tistore", register);
     }
 
     public static String aload(int register) {
+        limitController.updateStack(1);
         return registerInstruction("\taload", register);
     }
 
     public static String astore(int register) {
+        limitController.updateStack(-1);
         return registerInstruction("\tastore", register);
     }
 
     public static String iaload() {
+        limitController.updateStack(-1);
         return "\tiaload\n";
     }
 
     public static String iastore() {
+        limitController.updateStack(-3);
         return "\tiastore\n";
     }
 
@@ -53,6 +63,7 @@ public class MyJasminInstruction {
     }
 
     public static String iconst(int value) {
+        limitController.updateStack(1);
         if(value == -1) {
             return "\ticonst_m1\n";
         }
@@ -69,10 +80,12 @@ public class MyJasminInstruction {
     }
 
     public static String newArray() {
+        limitController.updateStack(0);
         return "\tnewarray int\n";
     }
 
     public static String newObject(String className) {
+        limitController.updateStack(1);
         return "\tnew " + className + "\n";
     }
 
@@ -81,6 +94,7 @@ public class MyJasminInstruction {
     }
 
     public static String arithOp(OperationType op) {
+        limitController.updateStack(-1);
         switch (op) {
             case ADD -> {
                 return "\tiadd\n";
@@ -101,15 +115,18 @@ public class MyJasminInstruction {
         return "";
     }
 
-    public static String invokeStaticOp(String className, String methodName, String argsTypes, String returnType) {
+    public static String invokeStaticOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
+        limitController.updateStack(-argsSize);
         return "\tinvokestatic " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
-    public static String invokeVirtualOp(String className, String methodName, String argsTypes, String returnType) {
+    public static String invokeVirtualOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
+        limitController.updateStack(-argsSize);
         return "\tinvokevirtual " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
-    public static String invokeSpecialOp(String className, String methodName, String argsTypes, String returnType) {
+    public static String invokeSpecialOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
+        limitController.updateStack(-argsSize);
         return "\tinvokespecial " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
@@ -118,19 +135,28 @@ public class MyJasminInstruction {
     }
 
     public static String goTo(String label){
+        limitController.updateStack(0);
         return "\tgoto " + label + "\n";
     }
 
     public static String ifne(String label){
+        limitController.updateStack(-1);
         return "\tifne " + label + "\n";
     }
 
     public static String iflt(String label){
+        limitController.updateStack(-1);
         return "\tiflt " + label + "\n";
     }
 
     public static String ifIcmplt(String label){
+        limitController.updateStack(-2);
         return "\tif_icmplt " + label + "\n";
+    }
+
+    public static String arrayLength(){
+        limitController.updateStack(0);
+        return "\tarraylength\n";
     }
 
 
