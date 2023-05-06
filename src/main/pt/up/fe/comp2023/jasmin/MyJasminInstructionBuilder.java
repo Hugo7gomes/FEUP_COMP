@@ -11,11 +11,12 @@ import static java.lang.Integer.parseInt;
 public class MyJasminInstructionBuilder {
     private final Method method;
     private final String superClass;
-    private int labels = 0;
+    private final MyLabelController labelController;
 
-    public MyJasminInstructionBuilder(Method method, String superClass) {
+    public MyJasminInstructionBuilder(Method method, String superClass, MyLabelController labelController) {
         this.method = method;
         this.superClass = superClass;
+        this.labelController = labelController;
     }
 
     // Method to build a jasmin instruction
@@ -269,10 +270,8 @@ public class MyJasminInstructionBuilder {
         if(opType == OperationType.LTH) {
             stringBuilder.append(leftOperandString);
 
-            this.labels++;
-            String firstLabel = "LTH_" + this.labels;
-            this.labels++;
-            String secondLabel = "LTH_" + this.labels;
+            String firstLabel = "LTH_" + this.labelController.nextLabel();
+            String secondLabel = "LTH_" + this.labelController.nextLabel();
 
             if(rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0"))
                 stringBuilder.append(MyJasminInstruction.iflt(firstLabel));

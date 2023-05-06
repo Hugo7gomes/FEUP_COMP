@@ -3,6 +3,8 @@ package pt.up.fe.comp2023.jasmin;
 import org.specs.comp.ollir.CallType;
 import org.specs.comp.ollir.OperationType;
 
+import java.util.Objects;
+
 public class MyJasminInstruction {
 
     public static MyLimitController limitController = new MyLimitController();
@@ -131,6 +133,7 @@ public class MyJasminInstruction {
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
+        int stackDiff = Objects.equals(type, "get") ? 1 : -2;
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
