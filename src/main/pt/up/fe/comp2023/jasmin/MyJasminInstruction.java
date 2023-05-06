@@ -121,5 +121,17 @@ public class MyJasminInstruction {
         return "\tgoto " + label + "\n";
     }
 
+    public static String ifne(String label){
+        return "\tifne " + label + "\n";
+    }
+
+    public static String iflt(String label){
+        return "\tiflt " + label + "\n";
+    }
+
+    public static String ifIcmplt(String label){
+        return "\tif_icmplt " + label + "\n";
+    }
+
 
 }

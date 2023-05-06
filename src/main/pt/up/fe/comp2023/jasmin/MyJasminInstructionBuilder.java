@@ -321,24 +321,37 @@ public class MyJasminInstructionBuilder {
         return MyJasminInstruction.goTo(instruction.getLabel());
     }
 
+    private String buildCondition(Instruction instruction, String label){
+        return buildInstruction(instruction) + MyJasminInstruction.ifne(label);
+    }
+
     private String buildBranch(CondBranchInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Instruction cond = instruction.getCondition();
         String label = instruction.getLabel();
         InstructionType type = cond.getInstType();
 
-        if(type == InstructionType.BINARYOPER){
-            BinaryOpInstruction binaryOp = (BinaryOpInstruction) cond;
-            Element leftOperand = binaryOp.getLeftOperand();
-            Element rightOperand = binaryOp.getRightOperand();
-            OperationType opType = binaryOp.getOperation().getOpType();
+        if(type == InstructionType.BINARYOPER) {
+            Element leftOperand = ((BinaryOpInstruction) cond).getLeftOperand();
+            Element rightOperand = ((BinaryOpInstruction) cond).getRightOperand();
+            OperationType opType = ((BinaryOpInstruction) cond).getOperation().getOpType();
 
-            String leftOperandString = loadOp(leftOperand);
-            String rightOperandString = loadOp(rightOperand);
+            if (opType == OperationType.LTH) {
+                stringBuilder.append(loadOp(leftOperand));
+                String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
 
-            stringBuilder.append(leftOperandString);
-            stringBuilder.append(rightOperandString);
+                if (literalRightOperand.equals("0") && rightOperand.isLiteral()) {
+                    stringBuilder.append(MyJasminInstruction.iflt(label));
+                } else {
+                    stringBuilder.append(loadOp(rightOperand));
+                    stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                }
 
+            } else {
+                stringBuilder.append(buildCondition(cond, label));
+            }
+        } else {
+            stringBuilder.append(buildCondition(cond, label));
         }
 
         return stringBuilder.toString();
