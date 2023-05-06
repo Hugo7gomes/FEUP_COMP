@@ -11,6 +11,7 @@ import static java.lang.Integer.parseInt;
 public class MyJasminInstructionBuilder {
     private final Method method;
     private final String superClass;
+    private int labels = 0;
 
     public MyJasminInstructionBuilder(Method method, String superClass) {
         this.method = method;
@@ -261,11 +262,34 @@ public class MyJasminInstructionBuilder {
         String leftOperandString = loadOp(leftOperand);
         String rightOperandString = loadOp(rightOperand);
 
-        stringBuilder.append(leftOperandString);
-        stringBuilder.append(rightOperandString);
+        if(opType == OperationType.LTH) {
+            stringBuilder.append(leftOperandString);
 
-        String inst = MyJasminInstruction.arithOp(opType);
-        stringBuilder.append(inst);
+            this.labels++;
+            String firstLabel = "LTH_" + this.labels;
+            this.labels++;
+            String secondLabel = "LTH_" + this.labels;
+
+            if(rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0"))
+                stringBuilder.append(MyJasminInstruction.iflt(firstLabel));
+            else {
+                stringBuilder.append(rightOperandString);
+                stringBuilder.append(MyJasminInstruction.ifIcmplt(firstLabel));
+            }
+
+            stringBuilder.append(MyJasminInstruction.iconst(0));
+            stringBuilder.append(MyJasminInstruction.goTo(secondLabel));
+            stringBuilder.append(firstLabel).append(":\n");
+            stringBuilder.append(MyJasminInstruction.iconst(1));
+            stringBuilder.append(MyJasminInstruction.goTo(secondLabel));
+            stringBuilder.append(":\n");
+
+        } else {
+            stringBuilder.append(leftOperandString);
+            stringBuilder.append(rightOperandString);
+            String inst = MyJasminInstruction.arithOp(opType);
+            stringBuilder.append(inst);
+        }
 
         return stringBuilder.toString();
     }
