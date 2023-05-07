@@ -1,18 +1,18 @@
 import io;
 
-class A {
-    int a;
+class CompileMethodInvocation {
 
-    public int x(){
-        a = 10;
-        io.print(a);
-        return a;
+    public static void main(String[] args) {
+
     }
 
-    public static void main(String[] args){
-        A a;
-        int b;
-        a = new A();
-        b = a.x();
+    public int foo() {
+        int a;
+
+        a = 1;
+
+        io.println(a);
+
+        return 0;
     }
 }
