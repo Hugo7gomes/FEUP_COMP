@@ -2,6 +2,7 @@ package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
@@ -121,6 +122,7 @@ public class MyOllirToJasminConverter {
         // Method Instructions
         MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method, this.superClass, this.labelController);
 
+        ArrayList<Instruction> instructions = method.getInstructions();
         for (Instruction instruction: method.getInstructions()) {
             for(String label: labelMap.keySet()){
                 if(labelMap.get(label).equals(instruction))
