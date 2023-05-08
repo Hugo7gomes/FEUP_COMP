@@ -121,8 +121,9 @@ public class MyOllirToJasminConverter {
 
         // Method Instructions
         MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method, this.superClass, this.labelController);
+        MyJasminInstruction.limitController.resetStack();
+        MyJasminInstruction.limitController.updateRegisters(method.getParams().size() + 1);
 
-        ArrayList<Instruction> instructions = method.getInstructions();
         for (Instruction instruction: method.getInstructions()) {
             for(String label: labelMap.keySet()){
                 if(labelMap.get(label).equals(instruction))

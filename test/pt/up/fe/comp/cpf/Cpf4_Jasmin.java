@@ -112,7 +112,7 @@ public class Cpf4_Jasmin {
         CpUtils.matches(jasminResult, JASMIN_METHOD_REGEX_PREFIX + "\\[I");
     }
 
-    /*checks if the index for loading a argument is correct (should be 1) */
+    /*checks if the index for loading an argument is correct (should be 1) */
     @Test
     public void section2_Arithmetic_BytecodeIndex_IloadArg() {
         var jasminResult = getJasminResult("arithmetic/ByteCodeIndexes1.ollir");

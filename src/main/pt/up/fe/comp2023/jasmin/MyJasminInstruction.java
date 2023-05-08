@@ -10,6 +10,7 @@ public class MyJasminInstruction {
     public static MyLimitController limitController = new MyLimitController();
 
     private static String registerInstruction(String instruction, int register) {
+        limitController.updateRegister(register);
         if(register >= 0 && register <= 3) {
             return instruction + "_" + register + "\n";
         }

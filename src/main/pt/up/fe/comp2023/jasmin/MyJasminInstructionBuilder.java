@@ -365,10 +365,12 @@ public class MyJasminInstructionBuilder {
 
             if (opType == OperationType.LTH) {
                 stringBuilder.append(loadOp(leftOperand));
-                String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
 
-                if (literalRightOperand.equals("0") && rightOperand.isLiteral()) {
-                    stringBuilder.append(MyJasminInstruction.iflt(label));
+
+                if (rightOperand.isLiteral()) {
+                    String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
+                    if (literalRightOperand.equals("0"))
+                        stringBuilder.append(MyJasminInstruction.iflt(label));
                 } else {
                     stringBuilder.append(loadOp(rightOperand));
                     stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
