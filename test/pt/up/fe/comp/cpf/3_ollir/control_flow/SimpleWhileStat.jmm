@@ -9,6 +9,7 @@ class SimpleWhileStat {
 		
         while (i < a) {
             i = i + 1;
+            a = a - 1;
         }
 		
         return i;
