@@ -1,4 +1,4 @@
-class CompileArithmetic {
+class ArrayAccessOnInt {
 
     public static void main(String[] args) {
 
@@ -8,9 +8,10 @@ class CompileArithmetic {
         int a;
         int b;
         int c;
+        a = 10;
+        b = a + 5;
+        c = b + a;
 
-        c = 10 + 5;
-
-        return 10;
+        return a;
     }
 }
