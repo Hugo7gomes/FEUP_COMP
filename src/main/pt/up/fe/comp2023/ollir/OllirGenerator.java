@@ -248,13 +248,14 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithNewIntArray(JmmNode jmmNode, String s) {
         StringBuilder code = new StringBuilder();
-        String typeParant = getType(jmmNode.getJmmParent(), s, jmmNode.getJmmParent().get("var"));
-        String type =  "." + extractType(typeParant);
+        String typeParent = getType(jmmNode.getJmmParent(), s, jmmNode.getJmmParent().get("var"));
+        String type =  "." + extractType(typeParent);
         StringBuilder prefixCode = new StringBuilder();
         String temp = nextTemp();
+        String tempType = ".i32";
         OllirCodeStruct ollirCodeStruct = visit(jmmNode.getJmmChild(0), s);
-        prefixCode.append(temp).append(type).append(" :=").append(type).append(" ").append(ollirCodeStruct.value).append(";\n");
-        code.append("new(array, ").append(temp).append(type).append(")").append(type);
+        prefixCode.append(temp).append(tempType).append(" :=").append(tempType).append(" ").append(ollirCodeStruct.value).append(";\n");
+        code.append("new(array, ").append(temp).append(tempType).append(")").append(type);
         return new OllirCodeStruct(prefixCode.toString(), code.toString());
     }
 
