@@ -375,6 +375,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         return new OllirCodeStruct();
     }
 
+    private OllirCodeStruct dealWithThis(JmmNode jmmNode, String s) {
+        return new OllirCodeStruct("", "this");
+    }
+
     public String getCode() {
         return codeOllir.toString();
     }
@@ -474,6 +478,8 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         addVisit("ArrayAssignment", this::dealWithArrayAssignment);
         addVisit("Indexing", this::dealWithIndexing);
         addVisit("WhileStmt", this::dealWithWhileStmt);
+        addVisit("This", this::dealWithThis);
     }
+
 }
 
