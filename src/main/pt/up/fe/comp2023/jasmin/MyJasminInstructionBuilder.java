@@ -267,17 +267,28 @@ public class MyJasminInstructionBuilder {
         String leftOperandString = loadOp(leftOperand);
         String rightOperandString = loadOp(rightOperand);
 
-        if(opType == OperationType.LTH) {
+        if(opType == OperationType.LTH || opType == OperationType.GTE) {
             stringBuilder.append(leftOperandString);
+            String firstLabel = "", secondLabel = "";
 
-            String firstLabel = "LTH_" + this.labelController.nextLabel();
-            String secondLabel = "LTH_" + this.labelController.nextLabel();
+            if(opType == OperationType.LTH){
+                firstLabel = "LTH_" + this.labelController.nextLabel();
+                secondLabel = "LTH_" + this.labelController.nextLabel();
+            } else {
+                firstLabel = "GTE_" + this.labelController.nextLabel();
+                secondLabel = "GTE_" + this.labelController.nextLabel();
+            }
+            
+            if (rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0"))
+                if(opType == OperationType.LTH)
+                    stringBuilder.append(MyJasminInstruction.iflt(firstLabel));
+                else stringBuilder.append(MyJasminInstruction.ifge(firstLabel));
 
-            if(rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0"))
-                stringBuilder.append(MyJasminInstruction.iflt(firstLabel));
             else {
                 stringBuilder.append(rightOperandString);
-                stringBuilder.append(MyJasminInstruction.ifIcmplt(firstLabel));
+                if(opType == OperationType.LTH)
+                    stringBuilder.append(MyJasminInstruction.ifIcmplt(firstLabel));
+                else stringBuilder.append(MyJasminInstruction.ifIcmpge(firstLabel));
             }
 
             stringBuilder.append(MyJasminInstruction.iconst(0));
@@ -363,14 +374,15 @@ public class MyJasminInstructionBuilder {
             Element rightOperand = ((BinaryOpInstruction) cond).getRightOperand();
             OperationType opType = ((BinaryOpInstruction) cond).getOperation().getOpType();
 
-            if (opType == OperationType.LTH) {
+            if (opType == OperationType.LTH || opType == OperationType.GTE) {
                 stringBuilder.append(loadOp(leftOperand));
-
 
                 if (rightOperand.isLiteral()) {
                     String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
                     if (literalRightOperand.equals("0"))
-                        stringBuilder.append(MyJasminInstruction.iflt(label));
+                        if(opType == OperationType.LTH)
+                            stringBuilder.append(MyJasminInstruction.iflt(label));
+                        else stringBuilder.append(MyJasminInstruction.ifge(label));
                 } else {
                     stringBuilder.append(loadOp(rightOperand));
                     stringBuilder.append(MyJasminInstruction.ifIcmplt(label));

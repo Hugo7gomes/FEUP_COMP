@@ -67,7 +67,6 @@ public class MyJasminUtils {
     // Returns the virtual register of a given element in the OLLIR code.
     public static int getRegister(Element element, Method method){
         HashMap<String, Descriptor> varTable = method.getVarTable();
-        String name = ((Operand) element).getName();
         return varTable.get(((Operand) element).getName()).getVirtualReg();
     }
 
