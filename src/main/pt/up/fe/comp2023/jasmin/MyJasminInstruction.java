@@ -153,9 +153,19 @@ public class MyJasminInstruction {
         return "\tiflt " + label + "\n";
     }
 
+    public static String ifge(String label){
+        limitController.updateStack(-1);
+        return "\tifge " + label + "\n";
+    }
+
     public static String ifIcmplt(String label){
         limitController.updateStack(-2);
         return "\tif_icmplt " + label + "\n";
+    }
+
+    public static String ifIcmpge(String label){
+        limitController.updateStack(-2);
+        return "\tif_icmpge " + label + "\n";
     }
 
     public static String arrayLength(){
