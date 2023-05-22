@@ -385,7 +385,9 @@ public class MyJasminInstructionBuilder {
                         else stringBuilder.append(MyJasminInstruction.ifge(label));
                 } else {
                     stringBuilder.append(loadOp(rightOperand));
-                    stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                    if(opType == OperationType.LTH)
+                        stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                    else stringBuilder.append(MyJasminInstruction.ifIcmpge(label));
                 }
 
             } else {
