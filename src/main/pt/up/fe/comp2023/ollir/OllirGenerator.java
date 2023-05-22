@@ -7,6 +7,7 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static pt.up.fe.comp2023.ollir.OllirAuxFunctions.*;
@@ -188,20 +189,26 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
     }
 
     private OllirCodeStruct dealWithExprStmt(JmmNode ExprStmt, String methodName) {
+        StringBuilder code = new StringBuilder();
         JmmNode methodCall = ExprStmt;
         if(ExprStmt.getJmmChild(0).getKind().equals("MethodCall")){
             methodCall = ExprStmt.getJmmChild(0);
         }
         JmmNode identifier = methodCall.getJmmChild(0);
         OllirCodeStruct args = new OllirCodeStruct("", "");
+        List <String> argsList = new ArrayList<>();
         if(methodCall.getChildren().size() > 1){
-            JmmNode arguments = methodCall.getJmmChild(1);
-            args = visit(arguments, methodName);
+            for(int i = 1; i < methodCall.getChildren().size(); i++){
+                JmmNode arguments = methodCall.getJmmChild(1);
+                args = visit(arguments, methodName);
+                code.append(args.prefixCode);
+                argsList.add(args.value);
+            }
         }
         String identifierType = getType(identifier, methodName, identifier.get("value"));
 
         String returnType = ".V";
-        StringBuilder code = new StringBuilder();
+
 
         if(!identifierType.equals("")){
             code.append("invokevirtual(").append(identifierType);
@@ -212,7 +219,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
         code.append(", \"").append(methodCall.get("name")).append("\"");
         if(!args.value.equals("")){
-            code.append(", ").append(args.value);
+            for(int i = 0; i < argsList.size(); i++){
+                code.append(", ").append(argsList.get(i));
+            }
+
         }
         code.append(")");
         if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
