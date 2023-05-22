@@ -12,6 +12,4 @@ invokestatic(ioPlus, "printResult", t1.i32).V;
 ret.V;
 }
 }
-BUILD SUCCESSFUL in 1s
-5 actionable tasks: 2 executed, 3 up-to-date
-22:56:05: Execution finished ':test --tests "pt.up.fe.comp.cpf.Cpf3_Ollir.section1_Basic_Method_Declaration_Array"'.
+

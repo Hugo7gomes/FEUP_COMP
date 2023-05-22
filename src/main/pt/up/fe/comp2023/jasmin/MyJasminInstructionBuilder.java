@@ -189,7 +189,7 @@ public class MyJasminInstructionBuilder {
                 }
                 else {
                     inst = MyJasminInstruction.newArray();
-                    stringBuilder.append(loadOp(instruction.getFirstArg())).append(inst);
+                    stringBuilder.append(loadOp(instruction.getListOfOperands().get(0))).append(inst);
                 }
                 return stringBuilder.toString();
             }
