@@ -11,10 +11,12 @@ import static java.lang.Integer.parseInt;
 public class MyJasminInstructionBuilder {
     private final Method method;
     private final String superClass;
+    private final MyLabelController labelController;
 
-    public MyJasminInstructionBuilder(Method method, String superClass) {
+    public MyJasminInstructionBuilder(Method method, String superClass, MyLabelController labelController) {
         this.method = method;
         this.superClass = superClass;
+        this.labelController = labelController;
     }
 
     // Method to build a jasmin instruction
@@ -30,6 +32,8 @@ public class MyJasminInstructionBuilder {
             case UNARYOPER -> ret = buildUnaryOp((UnaryOpInstruction) instruction);
             case BINARYOPER -> ret = buildBinaryOp((BinaryOpInstruction) instruction);
             case NOPER -> ret = buildSingleOp((SingleOpInstruction) instruction);
+            case GOTO -> ret = buildGoto((GotoInstruction) instruction);
+            case BRANCH -> ret = buildBranch((CondBranchInstruction) instruction);
         }
         return ret;
     }
@@ -172,6 +176,9 @@ public class MyJasminInstructionBuilder {
         CallType invokeType = instruction.getInvocationType();
         String inst;
         switch (invokeType) {
+            case arraylength -> {
+                return loadOp(instruction.getFirstArg()) + MyJasminInstruction.arrayLength();
+            }
             case NEW -> {
                 StringBuilder stringBuilder = new StringBuilder();
                 ElementType returnType = instruction.getReturnType().getTypeOfElement();
@@ -202,7 +209,8 @@ public class MyJasminInstructionBuilder {
                 }
 
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
-                inst = MyJasminInstruction.invokeStaticOp(className, methodName,MyJasminUtils.argTypes(params, this.method), returnType);
+                inst = MyJasminInstruction.invokeStaticOp(className, methodName,
+                        MyJasminUtils.argTypes(params, this.method), returnType, params.size());
 
                 stringBuilder.append(inst);
                 return stringBuilder.toString();
@@ -237,8 +245,8 @@ public class MyJasminInstructionBuilder {
                 String returnType = MyJasminUtils.getType(method.getOllirClass(), instruction.getReturnType());
 
                 if(callType == CallType.invokespecial)
-                    inst = MyJasminInstruction.invokeSpecialOp(className, methodName, paramTypes, returnType);
-                else inst = MyJasminInstruction.invokeVirtualOp(className, methodName, paramTypes, returnType);
+                    inst = MyJasminInstruction.invokeSpecialOp(className, methodName, paramTypes, returnType, params.size());
+                else inst = MyJasminInstruction.invokeVirtualOp(className, methodName, paramTypes, returnType, params.size());
 
                 stringBuilder.append(inst);
 
@@ -259,11 +267,43 @@ public class MyJasminInstructionBuilder {
         String leftOperandString = loadOp(leftOperand);
         String rightOperandString = loadOp(rightOperand);
 
-        stringBuilder.append(leftOperandString);
-        stringBuilder.append(rightOperandString);
+        if(opType == OperationType.LTH || opType == OperationType.GTE) {
+            stringBuilder.append(leftOperandString);
+            String firstLabel = "", secondLabel = "";
 
-        String inst = MyJasminInstruction.arithOp(opType);
-        stringBuilder.append(inst);
+            if(opType == OperationType.LTH){
+                firstLabel = "LTH_" + this.labelController.nextLabel();
+                secondLabel = "LTH_" + this.labelController.nextLabel();
+            } else {
+                firstLabel = "GTE_" + this.labelController.nextLabel();
+                secondLabel = "GTE_" + this.labelController.nextLabel();
+            }
+            
+            if (rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0"))
+                if(opType == OperationType.LTH)
+                    stringBuilder.append(MyJasminInstruction.iflt(firstLabel));
+                else stringBuilder.append(MyJasminInstruction.ifge(firstLabel));
+
+            else {
+                stringBuilder.append(rightOperandString);
+                if(opType == OperationType.LTH)
+                    stringBuilder.append(MyJasminInstruction.ifIcmplt(firstLabel));
+                else stringBuilder.append(MyJasminInstruction.ifIcmpge(firstLabel));
+            }
+
+            stringBuilder.append(MyJasminInstruction.iconst(0));
+            stringBuilder.append(MyJasminInstruction.goTo(secondLabel));
+            stringBuilder.append(firstLabel).append(":\n");
+            stringBuilder.append(MyJasminInstruction.iconst(1));
+            stringBuilder.append(MyJasminInstruction.goTo(secondLabel));
+            stringBuilder.append(secondLabel).append(":\n");
+
+        } else {
+            stringBuilder.append(leftOperandString);
+            stringBuilder.append(rightOperandString);
+            String inst = MyJasminInstruction.arithOp(opType);
+            stringBuilder.append(inst);
+        }
 
         return stringBuilder.toString();
     }
@@ -313,6 +353,49 @@ public class MyJasminInstructionBuilder {
     private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);
+    }
+
+    private String buildGoto(GotoInstruction instruction){
+        return MyJasminInstruction.goTo(instruction.getLabel());
+    }
+
+    private String buildCondition(Instruction instruction, String label){
+        return buildInstruction(instruction) + MyJasminInstruction.ifne(label);
+    }
+
+    private String buildBranch(CondBranchInstruction instruction){
+        StringBuilder stringBuilder = new StringBuilder();
+        Instruction cond = instruction.getCondition();
+        String label = instruction.getLabel();
+        InstructionType type = cond.getInstType();
+
+        if(type == InstructionType.BINARYOPER) {
+            Element leftOperand = ((BinaryOpInstruction) cond).getLeftOperand();
+            Element rightOperand = ((BinaryOpInstruction) cond).getRightOperand();
+            OperationType opType = ((BinaryOpInstruction) cond).getOperation().getOpType();
+
+            if (opType == OperationType.LTH || opType == OperationType.GTE) {
+                stringBuilder.append(loadOp(leftOperand));
+
+                if (rightOperand.isLiteral()) {
+                    String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
+                    if (literalRightOperand.equals("0"))
+                        if(opType == OperationType.LTH)
+                            stringBuilder.append(MyJasminInstruction.iflt(label));
+                        else stringBuilder.append(MyJasminInstruction.ifge(label));
+                } else {
+                    stringBuilder.append(loadOp(rightOperand));
+                    stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                }
+
+            } else {
+                stringBuilder.append(buildCondition(cond, label));
+            }
+        } else {
+            stringBuilder.append(buildCondition(cond, label));
+        }
+
+        return stringBuilder.toString();
     }
 
 }

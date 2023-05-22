@@ -2,15 +2,19 @@ package pt.up.fe.comp2023.jasmin;
 
 import org.specs.comp.ollir.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 public class MyOllirToJasminConverter {
 
     private final ClassUnit classUnit;
     private String superClass;
+    private final MyLabelController labelController;
 
     public MyOllirToJasminConverter(ClassUnit classUnit) {
         this.classUnit = classUnit;
+        this.labelController = new MyLabelController();
     }
     public String toJasmin() {
 
@@ -112,27 +116,36 @@ public class MyOllirToJasminConverter {
 
     public String buildMethodStatements(Method method){
         StringBuilder stringBuilder = new StringBuilder();
-
-        // Method Stack and Local Limits
-        if(method.getMethodAccessModifier() != AccessModifiers.DEFAULT){
-            stringBuilder.append("\t.limit stack 99\n");
-            stringBuilder.append("\t.limit locals 99\n");
-        }
+        StringBuilder methodBody = new StringBuilder();
+        HashMap<String, Instruction> labelMap = method.getLabels();
 
         // Method Instructions
-        MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method, this.superClass);
+        MyJasminInstructionBuilder myJasminInstructionBuilder = new MyJasminInstructionBuilder(method, this.superClass, this.labelController);
+        MyJasminInstruction.limitController.resetStack();
+        MyJasminInstruction.limitController.updateRegisters(method.getParams().size() + 1);
 
         for (Instruction instruction: method.getInstructions()) {
-            stringBuilder.append(myJasminInstructionBuilder.buildInstruction(instruction));
+            for(String label: labelMap.keySet()){
+                if(labelMap.get(label).equals(instruction))
+                    methodBody.append(label).append(":\n");
+            }
+            methodBody.append(myJasminInstructionBuilder.buildInstruction(instruction));
 
             if (instruction.getInstType() == InstructionType.CALL) {
                 ElementType returnType = ((CallInstruction) instruction).getReturnType().getTypeOfElement();
                 CallType callType = ((CallInstruction) instruction).getInvocationType();
                 if (!method.isConstructMethod() && (returnType != ElementType.VOID || callType == CallType.invokespecial)) {
-                    stringBuilder.append(MyJasminInstruction.pop());
+                    methodBody.append(MyJasminInstruction.pop());
                 }
             }
         }
+
+        // Method Stack and Local Limits
+        if(method.getMethodAccessModifier() != AccessModifiers.DEFAULT){
+            stringBuilder.append("\t.limit stack ").append(MyJasminInstruction.limitController.getStackLimit()).append("\n");
+            stringBuilder.append("\t.limit locals ").append(MyJasminInstruction.limitController.getLocalsLimit()).append("\n");
+        }
+        stringBuilder.append(methodBody);
 
         return stringBuilder.toString();
     }
