@@ -1,17 +1,14 @@
-import io;
+import c;
 
-class A {
+class B extends A {
     int a;
 
-    public int x(){
-        a = 10;
-        io.print(a);
-        return a;
+    public int foo(){
+        a = this.test(this);
+        return 0;
     }
 
-    public static void main(String[] args){
-        A a;
-        a = new A();
-        a.x();
+    int test(A h){
+        return 1;
     }
 }
