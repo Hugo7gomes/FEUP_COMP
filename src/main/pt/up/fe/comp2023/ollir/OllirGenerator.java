@@ -384,11 +384,11 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
 
     private OllirCodeStruct dealWithParenthesis(JmmNode jmmNode, String s) {
-        StringBuilder code = new StringBuilder();
-        code.append("(");
+        //StringBuilder code = new StringBuilder();
+        //code.append("(");
         OllirCodeStruct child = visit(jmmNode.getJmmChild(0), s);
-        code.append(child.prefixCode).append(")");
-        return new OllirCodeStruct(code.toString(), child.value);
+       //code.append(child.prefixCode).append(")");
+        return new OllirCodeStruct(child.prefixCode, child.value);
     }
 
     public String getCode() {
