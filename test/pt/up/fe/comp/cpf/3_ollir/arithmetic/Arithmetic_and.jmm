@@ -1,32 +1,22 @@
-import io;
-class WhileAndIF {
- 
-    public static void main(String[] args){
-        int a;
-        int b;
-        int c;
-        int[] d;
-        a = 20;
-        b = 10;
-        d = new int[10];
-        if( a < b){
-            c  = a-1;
-        }else{
-            c = b-1;
-        }
+import ioPlus;
+class ConditionArgsFuncCall {
 
-
-        while((0-1) < c){
-            d[c] = a-b; 
-            c= c-1;
-            a= a-1;
-            b= b-1;
-        }
-        c=0;
-        while(c < d.length){
-            io.println(d[c]);
-            c= c+1;
-        }
+    public int func(boolean a, boolean b, boolean c, boolean d){
+        ioPlus.printResult(10);
+        return 1;
     }
 
+    public static void main(String[] args) {
+        int a;
+        int b;
+        boolean i;
+        boolean j;
+        ConditionArgsFuncCall d;
+        d = new ConditionArgsFuncCall();
+        a = 10;
+        b = 5;
+        i = true;
+        j = false;
+        a = d.func(a < b, i && j , a < b && i, !i);
+    }
 }
