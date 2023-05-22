@@ -4,7 +4,10 @@ import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
 import pt.up.fe.comp.jmm.ast.JmmNodeImpl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmNode>, String> {
     private boolean changed = false;
@@ -20,7 +23,25 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
     }
 
     private String dealWithWhileStmt(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
+        JmmNode stmts = jmmNode.getJmmChild(1);
+        Set<String> variablesInsideWhile = getVariablesAssigned(stmts);
+        System.out.println("Variables assigned" + variablesInsideWhile);
+        for(String variable: variablesInsideWhile){
+            constMap.remove(variable);
+        }
+        JmmNode expression = jmmNode.getJmmChild(0);
+        visit(expression,constMap);
         return "";
+    }
+
+    private Set<String> getVariablesAssigned(JmmNode whileNode){
+        Set<String> variablesAssigned = new HashSet<>();
+        for(JmmNode child : whileNode.getChildren()){
+            if(child.getKind().equals("Assignment")){
+                variablesAssigned.add(child.get("var"));
+            }
+        }
+        return variablesAssigned;
     }
 
     private String dealWithIfStmt(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
@@ -29,11 +50,18 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
         JmmNode elseStmts = jmmNode.getJmmChild(2);
 
         if(expression.getKind().equals("Boolean")){
-            Boolean expressionValue = Boolean.valueOf(expression.get("value"));
+            boolean expressionValue = Boolean.parseBoolean(expression.get("value"));
             if(expressionValue){
                 visit(ifStmts, constMap);
             }else{
                 visit(elseStmts, constMap);
+            }
+        }else{
+            Set<String> variablesIf = getVariablesAssigned(ifStmts);
+            Set<String> variablesElse = getVariablesAssigned(elseStmts);
+            variablesIf.addAll(variablesElse);
+            for(String variable: variablesIf){
+                constMap.remove(variable);
             }
         }
         return "";

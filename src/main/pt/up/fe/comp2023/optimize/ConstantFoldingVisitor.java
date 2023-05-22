@@ -80,7 +80,6 @@ public class ConstantFoldingVisitor extends AJmmVisitor<String, String> {
                 newNode.put("value", Boolean.toString(result));
                 replaceNode(jmmNode, newNode);
             }
-
         }
         return "";
     }

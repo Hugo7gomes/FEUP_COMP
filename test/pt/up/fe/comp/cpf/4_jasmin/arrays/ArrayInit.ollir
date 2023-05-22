@@ -1,17 +1,15 @@
-import ioPlus;
-ArrayInit {
-
-    .construct ArrayInit().V {
-        invokespecial(this, "<init>").V;
-    }
-
-    .method public static main(args.array.String).V {
-temp0.i32 :=.i32 5.i32;
-a.array.i32 :=.array.i32 new(array, temp0.i32).array.i32;
-temp1.i32 :=.i32 arraylength(a.array.i32).i32.i32;
-invokestatic(ioPlus, "printResult", temp1.i32).V;
-
-ret.V;
-    }
-
+import Other;
+BasicMethods extends Other {
+.construct BasicMethods().V {
+invokespecial(this, "<init>").V;
 }
+
+.method public func4().array.i32 {
+t0.array.i32 :=.array.i32 1.i32;
+k.array.i32 :=.array.i32 new(array, t0.array.i32).array.i32;
+ret.array.i32 k.array.i32;
+}
+}
+BUILD SUCCESSFUL in 1s
+5 actionable tasks: 2 executed, 3 up-to-date
+22:56:05: Execution finished ':test --tests "pt.up.fe.comp.cpf.Cpf3_Ollir.section1_Basic_Method_Declaration_Array"'.
