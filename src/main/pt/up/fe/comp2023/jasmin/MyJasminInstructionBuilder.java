@@ -296,7 +296,7 @@ public class MyJasminInstructionBuilder {
             stringBuilder.append(firstLabel).append(":\n");
             stringBuilder.append(MyJasminInstruction.iconst(1));
             stringBuilder.append(MyJasminInstruction.goTo(secondLabel));
-            stringBuilder.append(":\n");
+            stringBuilder.append(secondLabel).append(":\n");
 
         } else {
             stringBuilder.append(leftOperandString);
