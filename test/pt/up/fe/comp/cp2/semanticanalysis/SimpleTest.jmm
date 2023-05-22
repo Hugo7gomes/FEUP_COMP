@@ -1,0 +1,17 @@
+class ArrayAccessOnInt {
+
+    public static void main(String[] args) {
+
+    }
+
+    public int foo() {
+        int a;
+        int b;
+        int c;
+        a = 10;
+        b = a + 5;
+        c = b + a;
+
+        return a;
+    }
+}

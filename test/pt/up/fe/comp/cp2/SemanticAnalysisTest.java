@@ -162,4 +162,17 @@ public class SemanticAnalysisTest {
         TestUtils.mustFail(result);
         System.out.println(result.getReports());
     }
+
+    @Test
+    public  void simpleTest(){
+        var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/SimpleTest.jmm"));
+        TestUtils.noErrors(result);
+    }
+
+    @Test
+    public  void callMethodNotExists(){
+        var result = TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cp2/semanticanalysis/CallMethodNotExists.jmm"));
+        TestUtils.mustFail(result);
+        System.out.println(result.getReports());
+    }
 }
