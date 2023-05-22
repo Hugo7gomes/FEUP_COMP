@@ -9,7 +9,7 @@ class WhileAndIF {
         a = 20;
         b = 10;
         d = new int[10];
-        if( a < b){
+        if(!(a < b)){
             c  = a-1;
         }else{
             c = b-1;
