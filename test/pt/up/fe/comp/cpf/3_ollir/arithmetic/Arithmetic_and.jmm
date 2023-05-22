@@ -3,10 +3,11 @@ class Arithmetic_and {
     int b;
     public static void main(String[] args) {
         boolean a;
+        boolean b;
 
         a = true && false;
         if(a) {
-            io.print(1);
+            io.print(a);
         } else {
             io.print(0);
         }
@@ -18,7 +19,7 @@ class Arithmetic_and {
         a.test();
         return 1;
     }
-    public int test() {
-        return this.test2();
+    public Arithmetic_and test() {
+       return this;
     }
 } 

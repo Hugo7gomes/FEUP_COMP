@@ -261,24 +261,25 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithIfElseStmt(JmmNode jmmNode, String s) {
         OllirCodeStruct condition = visit(jmmNode.getJmmChild(0), s);
-
+        String thenJump = "THEN" +nextJump();
+        String elseJump = "ENDIF" + nextJump();
         codeOllir.append(condition.prefixCode);
         codeOllir.append("if (")
                 .append(condition.value)
-                .append(") goto ").append("THEN").append(";\n");
+                .append(") goto ").append(thenJump).append(";\n");
 
         OllirCodeStruct elseStmt = visit(jmmNode.getJmmChild(2), s);
         codeOllir.append(elseStmt.prefixCode);
         codeOllir.append("goto ")
-                .append("ENDIF")
+                .append(elseJump)
                 .append(";\n")
-                .append("THEN")
+                .append(thenJump)
                 .append(":\n");
 
         visit(jmmNode.getJmmChild(1), s);
         codeOllir.append(elseStmt.prefixCode);
 
-        codeOllir.append("ENDIF")
+        codeOllir.append(elseJump)
                 .append(":\n");
 
         return new OllirCodeStruct();
@@ -359,18 +360,20 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithWhileStmt(JmmNode jmmNode, String s) {
         OllirCodeStruct condition = visit(jmmNode.getJmmChild(0), s);
+        String whileJump = "WHILE" + nextJump();
+        String endWhileJump = "ENDWHILE" + nextJump();
         codeOllir.append(condition.prefixCode);
-        codeOllir.append("WHILE")
+        codeOllir.append(whileJump)
                 .append(":\n")
                 .append("if (")
                 .append(condition.value)
-                .append(") goto ").append("ENDWHILE").append(";\n");
+                .append(") goto ").append(endWhileJump).append(";\n");
 
         visit(jmmNode.getJmmChild(1), s);
         codeOllir.append("goto ")
-                .append("WHILE")
+                .append(whileJump)
                 .append(";\n")
-                .append("ENDWHILE")
+                .append(endWhileJump)
                 .append(":\n");
         return new OllirCodeStruct();
     }

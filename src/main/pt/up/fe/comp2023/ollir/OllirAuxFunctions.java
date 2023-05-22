@@ -6,6 +6,7 @@ import pt.up.fe.comp.jmm.ast.JmmNode;
 
 public class OllirAuxFunctions {
     private static int count = 0;
+    private static int countJump = 0;
 
     public static String getCode(Symbol symbol){
         return symbol.getName() + "." + getCode(symbol.getType());
@@ -47,6 +48,10 @@ public class OllirAuxFunctions {
 
     public static String nextTemp(){
         return "t" + count++;
+    }
+
+    public static String nextJump(){
+        return Integer.toString(countJump++);
     }
 
     public static String operatorType(String operator){
