@@ -78,4 +78,9 @@ public class MyJasminUtils {
 
         return MyJasminInstruction.aload(arrayReg) + MyJasminInstruction.iload(firstReg);
     }
+
+    public static int getValue(Element element, String valueSign) {
+        String literalValue = valueSign + ((LiteralElement) element).getLiteral();
+        return Integer.parseInt(literalValue);
+    }
 }

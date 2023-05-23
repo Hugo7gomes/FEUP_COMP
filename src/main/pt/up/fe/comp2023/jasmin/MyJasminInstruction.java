@@ -92,7 +92,7 @@ public class MyJasminInstruction {
         return "\tnew " + className + "\n";
     }
 
-    public static String iinc(int register, String value) {
+    public static String iinc(int register, int value) {
         return "\tiinc " + register + " " + value + "\n";
     }
 
