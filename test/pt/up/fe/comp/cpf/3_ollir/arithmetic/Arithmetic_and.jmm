@@ -1,24 +1,14 @@
-class Arithmetic_and {
+class Test{
 
-    int b;
-    public static void main(String[] args) {
-        boolean a;
 
-       Arithmentic_and at;
-       at = new Arithmentic_and();
-        a = true && false;
-       at.test();
-        if(a) {
-            io.print(1);
-        } else {
-            io.print(0);
-        }
+  public int foo(){
 
-    }
-   public int test2() {
         return 1;
-    }
-    public Arithmetic_and test() {
-        return this;
-    }
-} 
+  }
+
+  public static void main(String[] args){
+        (new Test()).foo();
+
+  }
+
+}
