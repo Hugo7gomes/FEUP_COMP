@@ -201,7 +201,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         List <String> argsList = new ArrayList<>();
         if(methodCall.getChildren().size() > 1){
             for(int i = 1; i < methodCall.getChildren().size(); i++){
-                JmmNode arguments = methodCall.getJmmChild(1);
+                JmmNode arguments = methodCall.getJmmChild(i);
                 args = visit(arguments, methodName);
                 prefixCode.append(args.prefixCode);
                 argsList.add(args.value);
