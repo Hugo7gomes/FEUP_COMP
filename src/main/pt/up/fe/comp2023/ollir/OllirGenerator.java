@@ -212,15 +212,8 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             }
             args.prefixCode = prefixCode.toString();
         }
-        String identifierType;
-        if(identifier.getKind().equals("Parenthesis")){
-            while(identifier.getKind().equals("Parenthesis")){
-                identifier = identifier.getJmmChild(0);
-            }
-            identifierType = identifier.get("name");
-        }else {
-            identifierType = getType(identifier, methodName, identifier.get("value"));
-        }
+        String identifierType = getType(identifier, methodName, identifier.get("value"));
+
         String returnType = ".V";
 
 
@@ -262,6 +255,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         code.append(".").append(extractType(returnType));
         return new OllirCodeStruct(args.prefixCode, code.toString());
     }
+
 
 
     private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
