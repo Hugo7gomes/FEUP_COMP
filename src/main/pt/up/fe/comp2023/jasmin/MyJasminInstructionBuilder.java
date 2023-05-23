@@ -376,16 +376,17 @@ public class MyJasminInstructionBuilder {
 
             if (opType == OperationType.LTH || opType == OperationType.GTE) {
                 stringBuilder.append(loadOp(leftOperand));
+                if (rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0")) {
 
-                if (rightOperand.isLiteral()) {
-                    String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
-                    if (literalRightOperand.equals("0"))
-                        if(opType == OperationType.LTH)
-                            stringBuilder.append(MyJasminInstruction.iflt(label));
-                        else stringBuilder.append(MyJasminInstruction.ifge(label));
+                    if (opType == OperationType.LTH)
+                        stringBuilder.append(MyJasminInstruction.iflt(label));
+                    else stringBuilder.append(MyJasminInstruction.ifge(label));
+
                 } else {
                     stringBuilder.append(loadOp(rightOperand));
-                    stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                    if(opType == OperationType.LTH)
+                        stringBuilder.append(MyJasminInstruction.ifIcmplt(label));
+                    else stringBuilder.append(MyJasminInstruction.ifIcmpge(label));
                 }
 
             } else {
