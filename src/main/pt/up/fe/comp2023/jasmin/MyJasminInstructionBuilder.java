@@ -376,8 +376,7 @@ public class MyJasminInstructionBuilder {
 
             if (opType == OperationType.LTH || opType == OperationType.GTE) {
                 stringBuilder.append(loadOp(leftOperand));
-                String literalRightOperand = ((LiteralElement) rightOperand).getLiteral();
-                if (rightOperand.isLiteral() && literalRightOperand.equals("0")) {
+                if (rightOperand.isLiteral() && ((LiteralElement) rightOperand).getLiteral().equals("0")) {
 
                     if (opType == OperationType.LTH)
                         stringBuilder.append(MyJasminInstruction.iflt(label));
