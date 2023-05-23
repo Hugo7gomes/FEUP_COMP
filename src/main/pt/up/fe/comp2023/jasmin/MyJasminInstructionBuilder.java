@@ -150,17 +150,19 @@ public class MyJasminInstructionBuilder {
                 Element rightOperand = binaryExpression.getRightOperand();
 
                 if(!leftOperand.isLiteral() && rightOperand.isLiteral()){
-                    String value = valueSign + ((LiteralElement) rightOperand).getLiteral();
-                    if(Objects.equals(value, "1") &&
+                    String literalValue = valueSign + ((LiteralElement) rightOperand).getLiteral();
+                    int value = parseInt(literalValue);
+                    if((value >= -128 && value <= 127) &&
                             Objects.equals(((Operand) leftOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
 
-                        return MyJasminInstruction.iinc(reg, value);
+                        return MyJasminInstruction.iinc(reg, literalValue);
                     }
 
                 } else if (leftOperand.isLiteral() && !rightOperand.isLiteral()){
-                    String value = valueSign + ((LiteralElement) leftOperand).getLiteral();
-                    if(Objects.equals(value,"1") && Objects.equals(((Operand) rightOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
-                        return MyJasminInstruction.iinc(reg, value);
+                    String literalValue = valueSign + ((LiteralElement) leftOperand).getLiteral();
+                    int value = parseInt(literalValue);
+                    if((value >= -128 && value <= 127)  && Objects.equals(((Operand) rightOperand).getName(), ((Operand) leftHandMostSymbol).getName())){
+                        return MyJasminInstruction.iinc(reg, literalValue);
                     }
                 }
             }
