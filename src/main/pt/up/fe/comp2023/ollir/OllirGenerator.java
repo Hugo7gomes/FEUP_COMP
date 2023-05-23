@@ -188,8 +188,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         return new OllirCodeStruct(code.toString(), temp.toString());
     }
 
+
     private OllirCodeStruct dealWithExprStmt(JmmNode ExprStmt, String methodName) {
         StringBuilder code = new StringBuilder();
+        StringBuilder prefixCode = new StringBuilder();
         JmmNode methodCall = ExprStmt;
         if(ExprStmt.getJmmChild(0).getKind().equals("MethodCall")){
             methodCall = ExprStmt.getJmmChild(0);
@@ -201,9 +203,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             for(int i = 1; i < methodCall.getChildren().size(); i++){
                 JmmNode arguments = methodCall.getJmmChild(1);
                 args = visit(arguments, methodName);
-                code.append(args.prefixCode);
+                prefixCode.append(args.prefixCode);
                 argsList.add(args.value);
             }
+            args.prefixCode = prefixCode.toString();
         }
         String identifierType = getType(identifier, methodName, identifier.get("value"));
 
@@ -222,7 +225,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             for(int i = 0; i < argsList.size(); i++){
                 code.append(", ").append(argsList.get(i));
             }
-
         }
         code.append(")");
         if(!ExprStmt.getJmmParent().getKind().equals("Assignment")){
@@ -241,7 +243,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
             return new OllirCodeStruct();
         }
-        
+
         if(ExprStmt.getJmmParent().getKind().equals("Assignment")){
             JmmNode assignment = ExprStmt.getJmmParent();
             returnType = getType(assignment, methodName, assignment.get("var"));
@@ -249,6 +251,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         code.append(".").append(extractType(returnType));
         return new OllirCodeStruct(args.prefixCode, code.toString());
     }
+
 
     private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
         StringBuilder code = new StringBuilder();
