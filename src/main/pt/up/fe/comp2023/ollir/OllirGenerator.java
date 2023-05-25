@@ -209,11 +209,6 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 code.append("invokestatic(");
                 code.append(methodCall.getJmmChild(0).get("value"));
                 returnType = ".V";
-                if(methodCall.getJmmParent().getKind().equals("Assignment")){
-                    JmmNode assignment = methodCall.getJmmParent();
-                    returnType = extractType(getType(assignment, methodName, assignment.get("var")));
-                }
-
             }else {
                 code.append("invokevirtual(").append(identifierType);
                 returnType = getTypeOllir(symbolTable.getReturnType(methodCall.get("name")).getName());
@@ -223,7 +218,10 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
             code.append("invokevirtual(").append(codeChild.value);
             returnType = getTypeOllir(symbolTable.getReturnType(methodCall.get("name")).getName());
         }
-
+        if(methodCall.getJmmParent().getKind().equals("Assignment")){
+            JmmNode assignment = methodCall.getJmmParent();
+            returnType = extractType(getType(assignment, methodName, assignment.get("var")));
+        }
         OllirCodeStruct args = new OllirCodeStruct("", "");
         List<String> argsList = new ArrayList<>();
         for (int i = 1; i < methodCall.getChildren().size(); i++) {
