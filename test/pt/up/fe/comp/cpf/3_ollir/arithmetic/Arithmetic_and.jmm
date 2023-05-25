@@ -1,14 +1,16 @@
-class Test{
+import io;
 
+class Arithmetic_and {
+	public static void main(String[] args) {
+		boolean a;
 
-  public int foo(){
+		a = true && false;
 
-        return 1;
-  }
+		if(a) {
+			io.print(1);
+		} else {
+			io.print(0);
+		}
 
-  public static void main(String[] args){
-        (new Test()).foo();
-
-  }
-
+	}
 }
