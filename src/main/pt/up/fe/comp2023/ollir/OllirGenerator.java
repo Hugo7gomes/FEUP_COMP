@@ -161,9 +161,9 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         codeOllir.append(ollirCodeRhs.prefixCode);
         String varType = extractType(type);
         codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
-        if(assignment.getJmmChild(0).getKind().equals("NewObject")){
-            codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
-        }
+        //if(assignment.getJmmChild(0).getKind().equals("NewObject")){
+        //    codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
+        //}
 
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
@@ -238,14 +238,16 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
         code.append(")");
 
-        String temp = nextTemp();
+
         if(!returnType.contains(".")){
             returnType =  "." + returnType;
         }
-        codeChild.value = temp + returnType;
+
         code.append(returnType);
         code.append(";\n");
         if((!methodCall.getJmmParent().getKind().equals("ExprStmt")) && returnType.equals(".V")){
+            String temp = nextTemp();
+            codeChild.value = temp + returnType;
             args.prefixCode = codeChild.value +  " =" + returnType + " " + code;
         }else{
             codeChild.value = code.toString();
@@ -271,7 +273,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 .append(" :=.")
                 .append(jmmNode.get("name"));
         code.append(" new(").append(jmmNode.get("name")).append(").").append(jmmNode.get("name")).append(";\n");
-        code.append("invokespecial(").append(temp).append(", \"<init>\").V;\n");
+        code.append("invokespecial(").append(temp).append(", \"\").V;\n");
         return new OllirCodeStruct(code.toString(), temp);
     }
 
