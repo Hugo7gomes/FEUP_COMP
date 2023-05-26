@@ -24,7 +24,7 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
 
     private String dealWithWhileStmt(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
         JmmNode expression = jmmNode.getJmmChild(0);
-        visit(expression,constMap);
+
 
         JmmNode stmts = jmmNode.getJmmChild(1);
         visit(stmts,constMap);
@@ -33,6 +33,9 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
                 constMap.remove(child.get("var"));
             }
         }
+        System.out.println("ConstMap");
+        System.out.println(constMap);
+        visit(expression,constMap);
 
         return "";
     }
@@ -80,7 +83,6 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
 
 
     private String dealWithIdentifier(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
-        System.out.println("ConstMap:" + constMap);
         JmmNode constant = constMap.get(jmmNode.get("value"));
         //Check if the identifier is in the map
         if(constant != null){
@@ -109,6 +111,7 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
     private String dealWithAssignment(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
         //Get the expression
         JmmNode expression = jmmNode.getChildren().get(0);
+        visit(expression,constMap);
         //Check if the expression is a constant
         if(expression.getKind().equals("Boolean") || expression.getKind().equals("Integer")){
             //If it is, add it to the map
