@@ -159,11 +159,12 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         OllirCodeStruct ollirCodeRhs = visit(assignment.getJmmChild(0), methodName);
         codeOllir.append(ollirCodeRhs.prefixCode);
         String varType = extractType(type);
-        codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
-        if(assignment.getJmmChild(0).getKind().equals("NewObject")){
-            codeOllir.append("invokespecial(").append(type).append(", \"<init>\").V;\n");
-        }
 
+        if(assignment.getJmmChild(0).getKind().equals("NewObject")){
+            codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.value).append(";\n");
+            return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
+        }
+        codeOllir.append(type).append(" :=.").append(varType).append(" ").append(ollirCodeRhs.prefixCode).append(";\n");
         return new OllirCodeStruct(code.toString(), ollirCodeRhs.value);
     }
 
@@ -284,8 +285,12 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
     private OllirCodeStruct dealWithNewObject(JmmNode jmmNode, String methodName) {
         StringBuilder code = new StringBuilder();
-        code.append("new(").append(jmmNode.get("name")).append(").").append(jmmNode.get("name"));
-        return new OllirCodeStruct("", code.toString());
+        String temp = nextTemp() + "." + jmmNode.get("name");
+        code.append(temp).append(" :=.").append(jmmNode.get("name"));
+        code.append(" new(").append(jmmNode.get("name")).append(").").append(jmmNode.get("name")).append(";\n");
+        code.append("invokespecial(").append(temp).append(", \"<init>\").V;\n");
+
+        return new OllirCodeStruct(code.toString(), temp);
     }
 
     private OllirCodeStruct dealWithNewIntArray(JmmNode jmmNode, String s) {

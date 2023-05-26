@@ -1,19 +1,14 @@
 class Test{
 
-  public Test getTest(){
-        Test a;
-        a = new Test();
-        return a;
-  }
+
   public int foo(){
 
         return 1;
   }
 
   public static void main(String[] args){
-        Test a;
-        a = new Test();
-        (((a.getTest()).getTest()).getTest()).foo();
+        (new Test()).foo();
+
   }
 
 }
