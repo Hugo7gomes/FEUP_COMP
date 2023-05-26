@@ -5,7 +5,6 @@ import pt.up.fe.comp.jmm.analysis.table.SymbolTable;
 import pt.up.fe.comp.jmm.analysis.table.Type;
 import pt.up.fe.comp.jmm.ast.AJmmVisitor;
 import pt.up.fe.comp.jmm.ast.JmmNode;
-import pt.up.fe.comp2023.MySymbolTable;
 
 
 import java.util.ArrayList;
@@ -211,7 +210,12 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
                 returnType = ".V";
             }else {
                 code.append("invokevirtual(").append(identifierType);
+                if(methodCall.getJmmParent().getKind().equals("Assignment")) {
+                    JmmNode assignment = methodCall.getJmmParent();
+                    returnType = extractType(getType(assignment, methodName, assignment.get("var")));
+                }else{
                 returnType = getTypeOllir(symbolTable.getReturnType(methodCall.get("name")).getName());
+                }
             }
         } else {
             identifierType = extractType(codeChild.value);
