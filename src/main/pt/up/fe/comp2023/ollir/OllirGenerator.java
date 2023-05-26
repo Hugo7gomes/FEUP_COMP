@@ -250,18 +250,25 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
         }
         code.append(")");
         if(!methodCall.getJmmParent().getKind().equals("Assignment")){
+
             if(methodCall.getJmmParent().getKind().equals("Indexing")){
                 code.append(returnType);
                 codeOllir.append(args.prefixCode);
                 return new OllirCodeStruct("", code.toString());
             }
+
             if((!methodCall.getJmmParent().getKind().equals("ExprStmt")) && !returnType.equals(".V")){
+                code.append(returnType).append(";\n");;
                 String temp = nextTemp();
                 childCode.value = temp + returnType;
-                args.prefixCode = childCode.value +  " :=" + returnType + " " + code + returnType + ";\n";
+                args.prefixCode = childCode.value +  " :=" + returnType + " " + code;
             }else{
-                returnType = getTypeOllir(symbolTable.getReturnType(methodCall.get("name")).getName());
-                childCode.value = code.toString() + "." + returnType + ";\n";
+
+                if(!returnType.equals(".V")){
+                    returnType = "." + getTypeOllir(symbolTable.getReturnType(methodCall.get("name")).getName());
+                }
+                code.append(returnType).append(";\n");
+                childCode.value = code.toString();
             }
 
             return new OllirCodeStruct(childCode.prefixCode + args.prefixCode, childCode.value);
