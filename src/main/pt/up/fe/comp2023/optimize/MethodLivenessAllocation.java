@@ -3,10 +3,7 @@ package pt.up.fe.comp2023.optimize;
 import org.specs.comp.ollir.*;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class MethodLivenessAllocation {
 
@@ -18,6 +15,8 @@ public class MethodLivenessAllocation {
     private ArrayList<Set<String>> inAlive;
     private ArrayList<Set<String>> outAlive;
     private ArrayList<Node> nodeOrder;
+
+    private InteferenceGraph inteferenceGraph;
 
     public MethodLivenessAllocation(Method method, OllirResult ollirResult) {
         this.method = method;
@@ -178,7 +177,7 @@ public class MethodLivenessAllocation {
 
     //==================================================================================================================
 
-    public void getInteferenceGraph(){
+    public void getInterferenceGraph(){
         Set<String> vars = new HashSet<>();
         Set<String> params = new HashSet<>();
         Set<String> varTableVariables = this.method.getVarTable().keySet();
@@ -198,6 +197,45 @@ public class MethodLivenessAllocation {
             } else if (variable.equals("this")) vars.add(variable);
         }
 
+        //------//------
+
+        Set<RegisterNode> registerVars = new HashSet<>();
+        Set<RegisterNode> registerParams = new HashSet<>();
+
+        for(String node : vars){
+            registerVars.add(new RegisterNode(node));
+        }
+        for(String node : params){
+            registerParams.add(new RegisterNode(node));
+        }
+
+        this.inteferenceGraph = new InteferenceGraph(registerVars, registerParams);
+
+        //------//------
+
+        for(RegisterNode varX: this.inteferenceGraph.getVars()){
+            for(RegisterNode varY: this.inteferenceGraph.getVars()){
+                if(varX.equals(varY)) continue;
+
+                for(int i = 0; i < nodeOrder.size(); i++){
+                    if(defined.get(i).contains(varX.getName()) && outAlive.get(i).contains(varY.getName())){
+                        this.inteferenceGraph.addEdge(varX, varY);
+                    }
+                }
+            }
+        }
+
+    }
+
+    public void colorInterferenceGraph(){
+        Stack<RegisterNode> stack = new Stack<>();
+        int k = 0;
+
+        while(inteferenceGraph.countVisibleNodes() > 0){
+            RegisterNode node = inteferenceGraph.getLowestDegreeNode();
+            stack.push(node);
+            inteferenceGraph.removeNode(node);
+        }
     }
 
 }
