@@ -23,20 +23,23 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
     }
 
     private String dealWithWhileStmt(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
-        JmmNode stmts = jmmNode.getJmmChild(1);
-        Set<String> variablesInsideWhile = getVariablesAssigned(stmts);
-        System.out.println("Variables assigned" + variablesInsideWhile);
-        for(String variable: variablesInsideWhile){
-            constMap.remove(variable);
-        }
         JmmNode expression = jmmNode.getJmmChild(0);
         visit(expression,constMap);
+
+        JmmNode stmts = jmmNode.getJmmChild(1);
+        visit(stmts,constMap);
+        for(JmmNode child: stmts.getChildren()){
+            if(child.getKind().equals("Assignment")){
+                constMap.remove(child.get("var"));
+            }
+        }
+
         return "";
     }
 
-    private Set<String> getVariablesAssigned(JmmNode whileNode){
+    private Set<String> getVariablesAssigned(JmmNode node){
         Set<String> variablesAssigned = new HashSet<>();
-        for(JmmNode child : whileNode.getChildren()){
+        for(JmmNode child : node.getChildren()){
             if(child.getKind().equals("Assignment")){
                 variablesAssigned.add(child.get("var"));
             }
@@ -46,24 +49,25 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
 
     private String dealWithIfStmt(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
         JmmNode expression = jmmNode.getJmmChild(0);
-        JmmNode ifStmts = jmmNode.getJmmChild(1);
-        JmmNode elseStmts = jmmNode.getJmmChild(2);
+        visit(expression,constMap);
 
-        if(expression.getKind().equals("Boolean")){
-            boolean expressionValue = Boolean.parseBoolean(expression.get("value"));
-            if(expressionValue){
-                visit(ifStmts, constMap);
-            }else{
-                visit(elseStmts, constMap);
-            }
-        }else{
-            Set<String> variablesIf = getVariablesAssigned(ifStmts);
-            Set<String> variablesElse = getVariablesAssigned(elseStmts);
-            variablesIf.addAll(variablesElse);
-            for(String variable: variablesIf){
-                constMap.remove(variable);
+        JmmNode ifStmts = jmmNode.getJmmChild(1);
+        visit(ifStmts,constMap);
+        JmmNode elseStmts = jmmNode.getJmmChild(2);
+        visit(elseStmts,constMap);
+
+        for(JmmNode child : ifStmts.getChildren()){
+            if(child.getKind().equals("Assignment")){
+                constMap.remove(child.get("var"));
             }
         }
+
+        for(JmmNode child : elseStmts.getChildren()){
+            if(child.getKind().equals("Assignment")){
+                constMap.remove(child.get("var"));
+            }
+        }
+
         return "";
     }
 
@@ -76,6 +80,7 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
 
 
     private String dealWithIdentifier(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
+        System.out.println("ConstMap:" + constMap);
         JmmNode constant = constMap.get(jmmNode.get("value"));
         //Check if the identifier is in the map
         if(constant != null){
@@ -83,7 +88,6 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
             JmmNode newNode = new JmmNodeImpl(constant.getKind());
             newNode.put("value", constant.get("value"));
             replaceNode(jmmNode, newNode);
-            changed = true;
             return "changed";
         }
         return "";
@@ -98,11 +102,8 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
         }
         //Get the index of the node
         int index = parent.getChildren().indexOf(oldNode);
-        //Remove the node from the parent and add the new node in the same position
-        parent.removeJmmChild(index);
-        parent.add(newNode, index);
-        //Set the parent of the new node
-        newNode.setParent(parent);
+        parent.setChild(newNode,index);
+        this.changed = true;
     }
 
     private String dealWithAssignment(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
@@ -113,8 +114,7 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
             //If it is, add it to the map
             constMap.put(jmmNode.get("var"), expression);
         }else{
-            //If it isn't, visit it
-            visit(expression, constMap);
+            constMap.remove(jmmNode.get("var"));
         }
         return "";
     }
@@ -122,10 +122,8 @@ public class ConstantPropagationVisitor extends AJmmVisitor<HashMap<String, JmmN
     private String dealWithMethod(JmmNode jmmNode, HashMap<String, JmmNode> constMap) {
         //Create a new map for the method
         HashMap<String, JmmNode> methodMap = new HashMap<>();
-        //Visit method children with the new map
-        for(JmmNode child : jmmNode.getChildren()){
-            visit(child, methodMap);
-        }
+        //Visit method with the new map
+        defaultVisit(jmmNode,methodMap);
         return "";
     }
 
