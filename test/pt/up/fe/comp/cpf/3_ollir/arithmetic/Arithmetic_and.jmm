@@ -1,24 +1,16 @@
+import io;
+
 class Arithmetic_and {
+	public static void main(String[] args) {
+		boolean a;
 
-    int b;
-    public static void main(String[] args) {
-        boolean a;
+		a = true && false;
 
-       Arithmentic_and at;
-       at = new Arithmentic_and();
-        a = true && false;
-       at.test();
-        if(a) {
-            io.print(1);
-        } else {
-            io.print(0);
-        }
+		if(a) {
+			io.print(1);
+		} else {
+			io.print(0);
+		}
 
-    }
-   public int test2() {
-        return 1;
-    }
-    public Arithmetic_and test() {
-        return this;
-    }
-} 
+	}
+}

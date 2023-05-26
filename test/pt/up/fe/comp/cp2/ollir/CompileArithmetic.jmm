@@ -1,8 +1,16 @@
-import io;
-class AddMultConstants {
+class CompileArithmetic {
+
     public static void main(String[] args) {
-        io.println(1+2*3);
-        io.println(1+2*3+5);
-        io.println(1+2*3+6/3);
+
+    }
+
+    public int foo() {
+        int a;
+        int b;
+
+        a = 1;
+        b = 2;
+
+        return a + b;
     }
 }
