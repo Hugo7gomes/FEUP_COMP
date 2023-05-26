@@ -16,6 +16,7 @@ package pt.up.fe.comp.cpf;
 import org.junit.Test;
 import pt.up.fe.comp.CpUtils;
 import pt.up.fe.comp.TestUtils;
+import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.jasmin.JasminResult;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
 import pt.up.fe.specs.util.SpecsIo;
@@ -176,12 +177,15 @@ public class Cpf5_Optimizations {
         CpUtils.matches(optimized, "(bipush|sipush|ldc) 10\\s+ireturn");
     }
 
+    static JmmSemanticsResult getSemanticsResult(String filename) {
+        return TestUtils.analyse(SpecsIo.getResource("pt/up/fe/comp/cpf/2_semantic_analysis/" + filename));
+    }
 
     @Test
     public void section3_ConstProp_WithLoop() {
 
         String filename = "const_prop/PropWithLoop.jmm";
-
+        //getSemanticsResult(filename).getRootNode().toTree();
         JasminResult original = getJasminResult(filename);
         JasminResult optimized = getJasminResultOpt(filename);
 
@@ -190,6 +194,22 @@ public class Cpf5_Optimizations {
                 optimized);
 
         CpUtils.matches(optimized, "(bipush|sipush|ldc) 10\\s+imul");
+    }
+
+    @Test
+    public void section3_ConstProp_If() {
+
+        String filename = "const_prop/PropWithIf.jmm";
+
+        JasminResult original = getJasminResult(filename);
+
+        JasminResult optimized = getJasminResultOpt(filename);
+
+        CpUtils.assertNotEquals("Expected code to change with -o flag\n\nOriginal code:\n" + original.getJasminCode(),
+                original.getJasminCode(), optimized.getJasminCode(),
+                optimized);
+
+        //CpUtils.matches(optimized, "(bipush|sipush|ldc) 10\\s+ireturn");
     }
 
 
