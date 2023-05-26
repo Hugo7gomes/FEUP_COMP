@@ -252,7 +252,7 @@ public class OllirGenerator extends AJmmVisitor<String, OllirCodeStruct> {
 
         code.append(returnType);
         code.append(";\n");
-        if((!methodCall.getJmmParent().getKind().equals("ExprStmt")) && returnType.equals(".V")){
+        if((!methodCall.getJmmParent().getKind().equals("ExprStmt")) && !returnType.equals(".V")){
             String temp = nextTemp();
             codeChild.value = temp + returnType;
             args.prefixCode = codeChild.value +  " =" + returnType + " " + code;
