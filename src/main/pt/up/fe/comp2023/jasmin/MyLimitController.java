@@ -11,7 +11,7 @@ public class MyLimitController {
     public MyLimitController() {
         this.registers = new HashSet<>();
         this.maxStackSize = 0;
-        this.runningStackSize = 0;
+        this.runningStackSize = 1;
     }
 
     public int getStackLimit() {
