@@ -37,7 +37,6 @@ public class MethodLivenessAllocation {
         }
 
         this.nodeOrder.add(node);
-
     }
 
     private void orderNodes() {
@@ -45,7 +44,6 @@ public class MethodLivenessAllocation {
         this.nodeOrder = new ArrayList<>();
         ArrayList<Node> visited = new ArrayList<>();
         dfsOrderNodes(node, visited);
-
     }
 
     private void addUseDefSet(Node node, Element element, ArrayList<Set<String>> useDefSet){
@@ -62,7 +60,6 @@ public class MethodLivenessAllocation {
                 useDefSet.get(index).add(operand.getName());
         }
     }
-
 
     private void useDefAlgorithm(Node node) {
         useDefAlgorithm(node, null);
@@ -143,6 +140,7 @@ public class MethodLivenessAllocation {
         }
 
         boolean changedLiveness;
+
         do {
             changedLiveness = false;
             for(int i = 0; i < nodeOrder.size(); i++){
@@ -151,7 +149,6 @@ public class MethodLivenessAllocation {
                 Set<String> out = new HashSet<>(outAlive.get(i));
 
                 outAlive.get(i).clear();
-
 
                 for(Node successor: node.getSuccessors()){
                     int index = nodeOrder.indexOf(successor);
@@ -175,7 +172,7 @@ public class MethodLivenessAllocation {
 
     }
 
-    //==================================================================================================================
+    //=============================================
 
     public void getInterferenceGraph(){
         Set<String> vars = new HashSet<>();
@@ -184,6 +181,7 @@ public class MethodLivenessAllocation {
 
         List<String> paramNames = new ArrayList<>();
         List<Element> methodParams = this.method.getParams();
+
         for(Element param: methodParams){
             if(param instanceof Operand operand){
                 params.add(operand.getName());
