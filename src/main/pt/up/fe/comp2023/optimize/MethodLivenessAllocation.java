@@ -23,10 +23,6 @@ public class MethodLivenessAllocation {
     public MethodLivenessAllocation(Method method, OllirResult ollirResult) {
         this.method = method;
         this.ollirResult = ollirResult;
-        this.inAlive = new ArrayList<>();
-        this.outAlive = new ArrayList<>();
-        this.defined = new ArrayList<>();
-        this.used = new ArrayList<>();
     }
 
     public InterferenceGraph getInterferenceGraph() {
@@ -77,10 +73,6 @@ public class MethodLivenessAllocation {
             if(!elementType.equals(ElementType.THIS))
                 useDefSet.get(index).add(operand.getName());
         }
-    }
-
-    private void useDefAlgorithm(Node node) {
-        useDefAlgorithm(node, null);
     }
 
     public void useDefAlgorithm(Node node, Node parentNode){
@@ -158,13 +150,16 @@ public class MethodLivenessAllocation {
 
     public void inOutAlgorithm(){
         orderNodes();
-
+        this.inAlive = new ArrayList<>();
+        this.outAlive = new ArrayList<>();
+        this.defined = new ArrayList<>();
+        this.used = new ArrayList<>();
         for(int i = 0; i < nodeOrder.size(); i++){
             inAlive.add(new HashSet<>());
             outAlive.add(new HashSet<>());
             defined.add(new HashSet<>());
             used.add(new HashSet<>());
-            useDefAlgorithm(nodeOrder.get(i));
+            useDefAlgorithm(nodeOrder.get(i), null);
         }
 
         boolean changedLiveness;
