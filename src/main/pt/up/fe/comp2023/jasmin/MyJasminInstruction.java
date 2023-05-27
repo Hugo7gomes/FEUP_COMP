@@ -83,7 +83,6 @@ public class MyJasminInstruction {
     }
 
     public static String newArray() {
-        limitController.updateStack(0);
         return "\tnewarray int\n";
     }
 
@@ -135,11 +134,11 @@ public class MyJasminInstruction {
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
         int stackDiff = Objects.equals(type, "get") ? 1 : -2;
+        limitController.updateStack(stackDiff);
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
     public static String goTo(String label){
-        limitController.updateStack(0);
         return "\tgoto " + label + "\n";
     }
 
@@ -169,7 +168,6 @@ public class MyJasminInstruction {
     }
 
     public static String arrayLength(){
-        limitController.updateStack(0);
         return "\tarraylength\n";
     }
 
