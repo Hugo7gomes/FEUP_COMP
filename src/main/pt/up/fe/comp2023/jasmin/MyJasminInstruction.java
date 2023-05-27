@@ -130,7 +130,7 @@ public class MyJasminInstruction {
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
-        int stackDiff = Objects.equals(type, "get") ? 1 : -2;
+        int stackDiff = Objects.equals(type, "get") ? 0 : -2;
         limitController.updateStack(stackDiff);
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
