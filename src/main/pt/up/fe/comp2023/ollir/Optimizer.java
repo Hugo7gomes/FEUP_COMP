@@ -56,16 +56,12 @@ public class Optimizer implements JmmOptimization{
         boolean optimize = ollirResult.getConfig().getOrDefault("optimize", "false").equals("true");
         boolean registerAllocation = ollirResult.getConfig().getOrDefault("registerAllocation", "-1").equals("-1");
 
-        if(optimize){
-            do {
-                livenessAllocation
-            } while(livenessAllocation.hasChanged());
-        }
 
         if(!registerAllocation){
-            //livenessAllocation.inOutAlgorithm();
-            //livenessAllocation.colorGraph();
-            //livenessAllocation.allocateRegisters();
+            livenessAllocation.inOutAlgorithm();
+            livenessAllocation.interferenceGraph();
+            livenessAllocation.colorInterferenceGraph();
+            livenessAllocation.registerAlloc();
         }
 
         return ollirResult;

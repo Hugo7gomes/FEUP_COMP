@@ -2,6 +2,9 @@ package pt.up.fe.comp2023.optimize;
 
 import org.specs.comp.ollir.*;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
+import pt.up.fe.comp.jmm.report.Report;
+import pt.up.fe.comp.jmm.report.ReportType;
+import pt.up.fe.comp.jmm.report.Stage;
 
 import java.util.*;
 
@@ -16,11 +19,19 @@ public class MethodLivenessAllocation {
     private ArrayList<Set<String>> outAlive;
     private ArrayList<Node> nodeOrder;
 
-    private InteferenceGraph inteferenceGraph;
+    private InteferenceGraph interferenceGraph;
 
     public MethodLivenessAllocation(Method method, OllirResult ollirResult) {
         this.method = method;
         this.ollirResult = ollirResult;
+    }
+
+    public InteferenceGraph getInterferenceGraph() {
+        return interferenceGraph;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 
     private void dfsOrderNodes(Node node, ArrayList<Node> visited) {
@@ -174,7 +185,7 @@ public class MethodLivenessAllocation {
 
     //=============================================
 
-    public void getInterferenceGraph(){
+    public void setInterferenceGraph(){
         Set<String> vars = new HashSet<>();
         Set<String> params = new HashSet<>();
         Set<String> varTableVariables = this.method.getVarTable().keySet();
@@ -207,17 +218,17 @@ public class MethodLivenessAllocation {
             registerParams.add(new RegisterNode(node));
         }
 
-        this.inteferenceGraph = new InteferenceGraph(registerVars, registerParams);
+        this.interferenceGraph = new InteferenceGraph(registerVars, registerParams);
 
         //------//------
 
-        for(RegisterNode varX: this.inteferenceGraph.getVars()){
-            for(RegisterNode varY: this.inteferenceGraph.getVars()){
+        for(RegisterNode varX: this.interferenceGraph.getVars()){
+            for(RegisterNode varY: this.interferenceGraph.getVars()){
                 if(varX.equals(varY)) continue;
 
                 for(int i = 0; i < nodeOrder.size(); i++){
                     if(defined.get(i).contains(varX.getName()) && outAlive.get(i).contains(varY.getName())){
-                        this.inteferenceGraph.addEdge(varX, varY);
+                        this.interferenceGraph.addEdge(varX, varY);
                     }
                 }
             }
@@ -225,14 +236,54 @@ public class MethodLivenessAllocation {
 
     }
 
-    public void colorInterferenceGraph(){
+    public void colorInterferenceGraph(int maxRegisters){
         Stack<RegisterNode> stack = new Stack<>();
-        int k = 0;
+        int registers = 0;
 
-        while(inteferenceGraph.countVisibleNodes() > 0){
-            RegisterNode node = inteferenceGraph.getLowestDegreeNode();
-            stack.push(node);
-            inteferenceGraph.removeNode(node);
+        while(interferenceGraph.countVisibleNodes() > 0){
+            for(RegisterNode node: interferenceGraph.getVars()){
+                if(!node.isVisible()) continue;
+                int numVisibleNeighbours = node.countVisibleNeighbors();
+                if(numVisibleNeighbours < registers){
+                    node.setVisible(false);
+                    stack.push(node);
+                } else registers++;
+            }
+        }
+
+        if(maxRegisters > 0 && registers > maxRegisters) {
+            String reportString = "Method " + this.method.getMethodName() + " requires " + registers + " registers, but only " + maxRegisters + " are available.";
+            Report report = new Report(ReportType.ERROR, Stage.OPTIMIZATION, -1, reportString);
+            ollirResult.getReports().add(report);
+
+            throw new RuntimeException(reportString);
+        }
+
+        int startRegister = 1 + interferenceGraph.getParams().size();
+
+        while(!stack.isEmpty()){
+            RegisterNode node = stack.pop();
+            for(int i = startRegister; i <= registers + startRegister; i++){
+                if(!node.edgeHasRegister(i)) {
+                    node.setRegister(i);
+                    node.setVisible(true);
+                    break;
+                }
+            }
+            if(!node.isVisible()){
+                String reportString = "Register allocation failed for method " + this.method.getMethodName() + ".";
+                Report report = new Report(ReportType.ERROR, Stage.OPTIMIZATION, -1, reportString);
+                ollirResult.getReports().add(report);
+
+                throw new RuntimeException(reportString);
+            }
+        }
+
+        // starts at 1, because register 0 is reserved for "this"
+        int register = 1;
+        for(RegisterNode node: interferenceGraph.getParams()){
+            node.setRegister(register);
+            register++;
         }
     }
 
