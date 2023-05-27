@@ -13,9 +13,6 @@ import java.util.HashMap;
 public class Optimizer implements JmmOptimization{
     @Override
     public OllirResult toOllir(JmmSemanticsResult semanticsResult) {
-        JmmSemanticsResult newSemanticsResult = optimize(semanticsResult);
-        System.out.println("Optimized tree:");
-        System.out.println(newSemanticsResult.getRootNode().toTree());
 
         OllirGenerator ollirGenerator = new OllirGenerator(semanticsResult.getSymbolTable());
         ollirGenerator.visit(semanticsResult.getRootNode());
@@ -39,6 +36,8 @@ public class Optimizer implements JmmOptimization{
             constantPropagationVisitor.visit(semanticsResult.getRootNode(), new HashMap<>());
             constantFoldingVisitor.visit(semanticsResult.getRootNode(),"");
         }while(constantPropagationVisitor.hasChanged() || constantFoldingVisitor.hasChanged());
+        System.out.println("OPTIMIZED");
+        System.out.println(semanticsResult.getRootNode().toTree());
 
         return semanticsResult;
     }

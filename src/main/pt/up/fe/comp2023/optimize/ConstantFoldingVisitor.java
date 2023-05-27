@@ -23,21 +23,27 @@ public class ConstantFoldingVisitor extends AJmmVisitor<String, String> {
 
     private String dealWithUnaryOp(JmmNode jmmNode, String dummy) {
         JmmNode child = jmmNode.getChildren().get(0);
-        String value = child.get("value");
-        String newValue = "true";
-        if(value.equals("true")){
-            newValue = "false";
+        if(child.getKind().equals("Boolean")){
+            boolean value = Boolean.parseBoolean(child.get("value"));
+            JmmNode newNode = new JmmNodeImpl("Boolean");
+            String newValue;
+            if(value){
+                newValue = "false";
+            }else{
+                newValue = "true";
+            }
+            newNode.put("value", newValue);
+            replaceNode(jmmNode, newNode);
         }
-        JmmNode newNode = new JmmNodeImpl("Boolean");
-        newNode.put("value", newValue);
-        replaceNode(jmmNode, newNode);
-        changed = true;
         return "";
     }
 
     private String dealWithBinaryOp(JmmNode jmmNode, String dummy) {
         JmmNode left = jmmNode.getChildren().get(0);
         JmmNode right = jmmNode.getChildren().get(1);
+        visit(left);
+        visit(right);
+
         String op = jmmNode.get("op");
         if(left.getKind().equals("Integer") && right.getKind().equals("Integer")){
             int leftValue = Integer.parseInt(left.get("value"));
