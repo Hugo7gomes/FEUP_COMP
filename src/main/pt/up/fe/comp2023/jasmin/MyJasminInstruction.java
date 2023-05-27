@@ -16,41 +16,49 @@ public class MyJasminInstruction {
 
     public static String pop() {
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return "\tpop\n";
     }
 
     public static String dup() {
         limitController.updateStack(1);
+        limitController.applyStackSize();
         return "\tdup\n";
     }
 
     public static String iload(int register) {
         limitController.updateStack(1);
+        limitController.applyStackSize();
         return registerInstruction("\tiload", register);
     }
 
     public static String istore(int register) {
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return registerInstruction("\tistore", register);
     }
 
     public static String aload(int register) {
         limitController.updateStack(1);
+        limitController.applyStackSize();
         return registerInstruction("\taload", register);
     }
 
     public static String astore(int register) {
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return registerInstruction("\tastore", register);
     }
 
     public static String iaload() {
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return "\tiaload\n";
     }
 
     public static String iastore() {
         limitController.updateStack(-3);
+        limitController.applyStackSize();
         return "\tiastore\n";
     }
 
@@ -64,6 +72,7 @@ public class MyJasminInstruction {
 
     public static String iconst(int value) {
         limitController.updateStack(1);
+        limitController.applyStackSize();
         if(value == -1) {
             return "\ticonst_m1\n";
         }
@@ -85,6 +94,7 @@ public class MyJasminInstruction {
 
     public static String newObject(String className) {
         limitController.updateStack(1);
+        limitController.applyStackSize();
         return "\tnew " + className + "\n";
     }
 
@@ -94,6 +104,7 @@ public class MyJasminInstruction {
 
     public static String arithOp(OperationType op) {
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         switch (op) {
             case ADD -> {
                 return "\tiadd\n";
@@ -118,7 +129,9 @@ public class MyJasminInstruction {
         limitController.updateStack(-argsSize);
         if(!returnType.equals("V")) {
             limitController.updateStack(1);
+
         }
+        limitController.applyStackSize();
         return "\tinvokestatic " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
@@ -127,6 +140,7 @@ public class MyJasminInstruction {
         if(!returnType.equals("V")) {
             limitController.updateStack(1);
         }
+        limitController.applyStackSize();
         return "\tinvokevirtual " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
@@ -135,12 +149,14 @@ public class MyJasminInstruction {
         if(!returnType.equals("V")) {
             limitController.updateStack(1);
         }
+        limitController.applyStackSize();
         return "\tinvokespecial " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
         int stackDiff = Objects.equals(type, "get") ? 1 : -2;
         limitController.updateStack(stackDiff);
+        limitController.applyStackSize();
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
 
@@ -150,32 +166,36 @@ public class MyJasminInstruction {
 
     public static String ifne(String label){
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return "\tifne " + label + "\n";
     }
 
     public static String iflt(String label){
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return "\tiflt " + label + "\n";
     }
 
     public static String ifge(String label){
         limitController.updateStack(-1);
+        limitController.applyStackSize();
         return "\tifge " + label + "\n";
     }
 
     public static String ifIcmplt(String label){
         limitController.updateStack(-2);
+        limitController.applyStackSize();
         return "\tif_icmplt " + label + "\n";
     }
 
     public static String ifIcmpge(String label){
         limitController.updateStack(-2);
+        limitController.applyStackSize();
         return "\tif_icmpge " + label + "\n";
     }
 
     public static String arrayLength(){
         return "\tarraylength\n";
     }
-
 
 }
