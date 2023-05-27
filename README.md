@@ -1,5 +1,17 @@
 # Compilers Project
 
+## Team Members & Work Distribution (%)
+
+| Name                  | UP          | Work Distribution |
+| --------------------- | ----------- |------------------ |
+| António Ferreira      | up202004735 | 33%               |
+| Hugo Gomes            | up202004343 | 33%               |
+| João Moreira          | up202005035 | 33%               |
+
+## Self Evaluation
+
+We think that, due to the quality of our code and the fact that we accomplished all of the proposed objetives, our project deserves a **20** (out of 20). 
+
 For this project, you need to install [Java](https://jdk.java.net/), [Gradle](https://gradle.org/install/), and [Git](https://git-scm.com/downloads/) (and optionally, a [Git GUI client](https://git-scm.com/downloads/guis), such as TortoiseGit or GitHub Desktop). Please check the [compatibility matrix](https://docs.gradle.org/current/userguide/compatibility.html) for Java and Gradle versions.
 
 ## Project setup
@@ -45,16 +57,3 @@ The testing framework, which uses the class ``pt.up.fe.comp.TestUtils``, has met
 In order for the test class to find your implementations for the stages, it uses the file ``config.properties`` that is in root of your repository. It has four fields, one for each stage (i.e. ``ParserClass``, ``AnalysisClass``, ``OptimizationClass``, ``BackendClass``), and initially it only has one value, ``pt.up.fe.comp2023.SimpleParser``, associated with the first stage.
 
 During the development of your compiler you will update this file in order to setup the classes that implement each of the compilation stages.
-
-
-### Team Members & Work Distribution (%)
-
-| Name                  | UP          | Work Distribution |
-| --------------------- | ----------- |------------------ |
-| António Ferreira      | up202004735 | 33%               |
-| Hugo Gomes            | up202004343 | 33%               |
-| João Moreira          | up202005035 | 33%               |
-
-### Self Evaluation
-
-We think that, due to the quality of our code and the fact that we accomplished all of the proposed objetives, our project deserves a **19** (out of 20). 
