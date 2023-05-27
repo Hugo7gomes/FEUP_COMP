@@ -116,26 +116,19 @@ public class MyJasminInstruction {
 
     public static String invokeStaticOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
-        if(!returnType.equals("V")) {
-            limitController.updateStack(1);
 
-        }
         return "\tinvokestatic " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String invokeVirtualOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
-        if(!returnType.equals("V")) {
-            limitController.updateStack(1);
-        }
+
         return "\tinvokevirtual " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String invokeSpecialOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
-        if(!returnType.equals("V")) {
-            limitController.updateStack(1);
-        }
+
         return "\tinvokespecial " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
