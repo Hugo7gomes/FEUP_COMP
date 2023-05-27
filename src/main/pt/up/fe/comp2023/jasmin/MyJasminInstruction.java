@@ -116,21 +116,30 @@ public class MyJasminInstruction {
 
     public static String invokeStaticOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
+        if(!returnType.equals("V")) {
+            limitController.updateStack(1);
+        }
         return "\tinvokestatic " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String invokeVirtualOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
+        if(!returnType.equals("V")) {
+            limitController.updateStack(1);
+        }
         return "\tinvokevirtual " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String invokeSpecialOp(String className, String methodName, String argsTypes, String returnType, int argsSize) {
         limitController.updateStack(-argsSize);
+        if(!returnType.equals("V")) {
+            limitController.updateStack(1);
+        }
         return "\tinvokespecial " + className + "/" + methodName + argsTypes +  returnType + "\n";
     }
 
     public static String fieldOp(String type, String className, String fieldName, String fieldType) {
-        int stackDiff = Objects.equals(type, "get") ? 0 : -2;
+        int stackDiff = Objects.equals(type, "get") ? 1 : -2;
         limitController.updateStack(stackDiff);
         return "\t" + type + " " + className + "/" + fieldName + " " + fieldType + "\n";
     }
