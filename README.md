@@ -46,7 +46,15 @@ In order for the test class to find your implementations for the stages, it uses
 
 During the development of your compiler you will update this file in order to setup the classes that implement each of the compilation stages.
 
-### Team members
-- António Ferreira - up202004735
-- Hugo Gomes - up202004343
-- João Moreira - up202003550
+
+### Team Members & Work Distribution (%)
+
+| Name                  | UP          | Work Distribution |
+| --------------------- | ----------- |------------------ |
+| António Ferreira      | up202004735 | 33%               |
+| Hugo Gomes            | up202004343 | 33%               |
+| João Moreira          | up202005035 | 33%               |
+
+### Self Evaluation
+
+We think that, due to the quality of our code and the fact that we accomplished all of the proposed objetives, our project deserves a **19** (out of 20). 
