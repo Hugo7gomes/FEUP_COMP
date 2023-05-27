@@ -3,7 +3,6 @@ package pt.up.fe.comp2023.ollir;
 import pt.up.fe.comp.jmm.analysis.JmmSemanticsResult;
 import pt.up.fe.comp.jmm.ollir.JmmOptimization;
 import pt.up.fe.comp.jmm.ollir.OllirResult;
-import pt.up.fe.comp2023.ollir.OllirGenerator;
 import pt.up.fe.comp2023.optimize.ConstantFoldingVisitor;
 import pt.up.fe.comp2023.optimize.ConstantPropagationVisitor;
 import pt.up.fe.comp2023.optimize.LivenessAllocation;
@@ -51,18 +50,15 @@ public class Optimizer implements JmmOptimization{
             System.out.println(ollirResult.getOllirCode());
         }
 
+        if(ollirResult.getConfig().getOrDefault("registerAllocation", "-1").equals("-1"))
+            return ollirResult;
+
         LivenessAllocation livenessAllocation = new LivenessAllocation(ollirResult);
 
-        boolean optimize = ollirResult.getConfig().getOrDefault("optimize", "false").equals("true");
-        boolean registerAllocation = ollirResult.getConfig().getOrDefault("registerAllocation", "-1").equals("-1");
-
-
-        if(!registerAllocation){
-            livenessAllocation.inOutAlgorithm();
-            livenessAllocation.interferenceGraph();
-            livenessAllocation.colorInterferenceGraph();
-            livenessAllocation.registerAlloc();
-        }
+        livenessAllocation.inOutAlgorithm();
+        livenessAllocation.interferenceGraph();
+        livenessAllocation.colorInterferenceGraph();
+        livenessAllocation.registerAlloc();
 
         return ollirResult;
     }

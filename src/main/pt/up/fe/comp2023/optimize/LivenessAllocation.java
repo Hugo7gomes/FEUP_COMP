@@ -47,10 +47,10 @@ public class LivenessAllocation {
     public void registerAlloc() {
         for(MethodLivenessAllocation method: methodLivenessAllocations){
             HashMap<String, Descriptor> variableTable = method.getMethod().getVarTable();
-            for(RegisterNode node: method.getInterferenceGraph().getVars()){
+            for(RegisterNode node: method.getInterferenceGraph().vars()){
                 variableTable.get(node.getName()).setVirtualReg(node.getRegister());
             }
-            for(RegisterNode node: method.getInterferenceGraph().getParams()){
+            for(RegisterNode node: method.getInterferenceGraph().params()){
                 variableTable.get(node.getName()).setVirtualReg(node.getRegister());
             }
             if(variableTable.get("this") != null){

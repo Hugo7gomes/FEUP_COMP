@@ -2,14 +2,7 @@ package pt.up.fe.comp2023.optimize;
 
 import java.util.Set;
 
-public class InteferenceGraph {
-    private final Set<RegisterNode> vars;
-    private final Set<RegisterNode> params;
-
-    public InteferenceGraph(Set<RegisterNode> vars, Set<RegisterNode> params) {
-        this.vars = vars;
-        this.params = params;
-    }
+public record InterferenceGraph(Set<RegisterNode> vars, Set<RegisterNode> params) {
 
     public void addEdge(RegisterNode node1, RegisterNode node2) {
         node1.addEdge(node2);
@@ -21,14 +14,6 @@ public class InteferenceGraph {
         node2.removeEdge(node1);
     }
 
-    public Set<RegisterNode> getVars() {
-        return vars;
-    }
-
-    public Set<RegisterNode> getParams() {
-        return params;
-    }
-
     public int countVisibleNodes() {
         int count = 0;
         for (RegisterNode node : vars) {
@@ -37,5 +22,4 @@ public class InteferenceGraph {
         }
         return count;
     }
-
 }

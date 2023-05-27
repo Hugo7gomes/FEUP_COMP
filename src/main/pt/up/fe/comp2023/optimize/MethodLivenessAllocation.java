@@ -18,15 +18,14 @@ public class MethodLivenessAllocation {
     private ArrayList<Set<String>> inAlive;
     private ArrayList<Set<String>> outAlive;
     private ArrayList<Node> nodeOrder;
-
-    private InteferenceGraph interferenceGraph;
+    private InterferenceGraph interferenceGraph;
 
     public MethodLivenessAllocation(Method method, OllirResult ollirResult) {
         this.method = method;
         this.ollirResult = ollirResult;
     }
 
-    public InteferenceGraph getInterferenceGraph() {
+    public InterferenceGraph getInterferenceGraph() {
         return interferenceGraph;
     }
 
@@ -61,13 +60,13 @@ public class MethodLivenessAllocation {
         int index = nodeOrder.indexOf(node);
         if(element instanceof ArrayOperand arrayOperand){
             for(Element elem: arrayOperand.getIndexOperands()){
-                addUseDefSet(node, elem, useDefSet);
+                addUseDefSet(node, elem, used);
             }
             useDefSet.get(index).add(arrayOperand.getName());
         }
         if(element instanceof Operand operand){
             ElementType elementType = operand.getType().getTypeOfElement();
-            if(elementType.equals(ElementType.THIS))
+            if(!elementType.equals(ElementType.THIS))
                 useDefSet.get(index).add(operand.getName());
         }
     }
@@ -132,6 +131,20 @@ public class MethodLivenessAllocation {
                 SingleOpInstruction instruction = (SingleOpInstruction) node;
                 addUseDefSet(useDefNode, instruction.getSingleOperand(), used);
             }
+            case "OpCondInstruction" -> {
+                OpCondInstruction instruction = (OpCondInstruction) node;
+                List<Element> operands = instruction.getOperands();
+                for (Element operand : operands) {
+                    addUseDefSet(useDefNode, operand, used);
+                }
+            }
+            case "SingleOpCondInstruction" -> {
+                SingleOpCondInstruction instruction = (SingleOpCondInstruction) node;
+                List<Element> operands = instruction.getOperands();
+                for (Element operand : operands) {
+                    addUseDefSet(useDefNode, operand, used);
+                }
+            }
         }
     }
 
@@ -176,7 +189,7 @@ public class MethodLivenessAllocation {
 
                 inAlive.get(i).addAll(outDefDiff);
 
-                changedLiveness = !in.equals(inAlive.get(i)) || !out.equals(outAlive.get(i));
+                changedLiveness = changedLiveness || !in.equals(inAlive.get(i)) || !out.equals(outAlive.get(i));
 
             }
         } while(changedLiveness);
@@ -185,25 +198,33 @@ public class MethodLivenessAllocation {
 
     //=============================================
 
-    public void setInterferenceGraph(){
-        Set<String> vars = new HashSet<>();
-        Set<String> params = new HashSet<>();
-        Set<String> varTableVariables = this.method.getVarTable().keySet();
+    private String getElemName(Element elem){
+        if(elem instanceof Operand operand) return operand.getName();
+        return null;
+    }
 
+    private List<String> getParamNames(){
         List<String> paramNames = new ArrayList<>();
         List<Element> methodParams = this.method.getParams();
 
         for(Element param: methodParams){
             if(param instanceof Operand operand){
-                params.add(operand.getName());
-                paramNames.add(operand.getName());
+                paramNames.add(getElemName(param));
             }
         }
+        return paramNames;
+    }
+
+    public void setInterferenceGraph(){
+        Set<String> vars = new HashSet<>();
+        Set<String> params = new HashSet<>();
+        Set<String> varTableVariables = this.method.getVarTable().keySet();
+        List<String> paramNames = getParamNames();
 
         for(String variable: varTableVariables){
             if(paramNames.contains(variable)){
                 params.add(variable);
-            } else if (variable.equals("this")) vars.add(variable);
+            } else if (!variable.equals("this")) vars.add(variable);
         }
 
         //------//------
@@ -218,12 +239,12 @@ public class MethodLivenessAllocation {
             registerParams.add(new RegisterNode(node));
         }
 
-        this.interferenceGraph = new InteferenceGraph(registerVars, registerParams);
+        this.interferenceGraph = new InterferenceGraph(registerVars, registerParams);
 
         //------//------
 
-        for(RegisterNode varX: this.interferenceGraph.getVars()){
-            for(RegisterNode varY: this.interferenceGraph.getVars()){
+        for(RegisterNode varX: this.interferenceGraph.vars()){
+            for(RegisterNode varY: this.interferenceGraph.vars()){
                 if(varX.equals(varY)) continue;
 
                 for(int i = 0; i < nodeOrder.size(); i++){
@@ -241,7 +262,7 @@ public class MethodLivenessAllocation {
         int registers = 0;
 
         while(interferenceGraph.countVisibleNodes() > 0){
-            for(RegisterNode node: interferenceGraph.getVars()){
+            for(RegisterNode node: interferenceGraph.vars()){
                 if(!node.isVisible()) continue;
                 int numVisibleNeighbours = node.countVisibleNeighbors();
                 if(numVisibleNeighbours < registers){
@@ -259,7 +280,7 @@ public class MethodLivenessAllocation {
             throw new RuntimeException(reportString);
         }
 
-        int startRegister = 1 + interferenceGraph.getParams().size();
+        int startRegister = 1 + interferenceGraph.params().size();
 
         while(!stack.isEmpty()){
             RegisterNode node = stack.pop();
@@ -281,7 +302,7 @@ public class MethodLivenessAllocation {
 
         // starts at 1, because register 0 is reserved for "this"
         int register = 1;
-        for(RegisterNode node: interferenceGraph.getParams()){
+        for(RegisterNode node: interferenceGraph.params()){
             node.setRegister(register);
             register++;
         }

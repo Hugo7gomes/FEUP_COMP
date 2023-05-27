@@ -1,6 +1,7 @@
 package pt.up.fe.comp2023.optimize;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class RegisterNode {
     private final String name;
@@ -62,7 +63,7 @@ public class RegisterNode {
 
     public boolean edgeHasRegister(int register) {
         for (RegisterNode edge : edges) {
-            if (edge.getRegister() == -1 || edge.getRegister() != register)
+            if (edge.getRegister() != -1 && edge.getRegister() == register)
                 return true;
         }
         return false;
@@ -73,8 +74,9 @@ public class RegisterNode {
         if (o == this) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RegisterNode node = (RegisterNode) o;
-        return node.getName().equals(this.getName());
+        return Objects.equals(name, node.name);
     }
+
 
 
 }
