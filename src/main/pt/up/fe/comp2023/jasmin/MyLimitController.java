@@ -7,7 +7,6 @@ public class MyLimitController {
     private Set<Integer> registers;
     private int maxStackSize;
     private int runningStackSize;
-    private int nextStackSize;
 
     public MyLimitController() {
         this.registers = new HashSet<>();
@@ -16,7 +15,7 @@ public class MyLimitController {
     }
 
     public int getStackLimit() {
-        return maxStackSize;
+        return maxStackSize += 2;
     }
 
     public int getLocalsLimit() {
@@ -24,11 +23,7 @@ public class MyLimitController {
     }
 
     public void updateStack(int value) {
-        this.nextStackSize += value;
-    }
-
-    public void applyStackSize() {
-        this.runningStackSize = this.nextStackSize;
+        this.runningStackSize += value;
         if (this.runningStackSize > this.maxStackSize) {
             this.maxStackSize = this.runningStackSize;
         }
