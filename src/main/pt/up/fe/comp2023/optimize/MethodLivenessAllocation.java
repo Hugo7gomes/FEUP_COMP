@@ -23,6 +23,10 @@ public class MethodLivenessAllocation {
     public MethodLivenessAllocation(Method method, OllirResult ollirResult) {
         this.method = method;
         this.ollirResult = ollirResult;
+        this.inAlive = new ArrayList<>();
+        this.outAlive = new ArrayList<>();
+        this.defined = new ArrayList<>();
+        this.used = new ArrayList<>();
     }
 
     public InterferenceGraph getInterferenceGraph() {
@@ -31,6 +35,10 @@ public class MethodLivenessAllocation {
 
     public Method getMethod() {
         return method;
+    }
+
+    public HashMap<String, Descriptor> getVariableTable() {
+        return method.getVarTable();
     }
 
     private void dfsOrderNodes(Node node, ArrayList<Node> visited) {
@@ -150,10 +158,6 @@ public class MethodLivenessAllocation {
 
     public void inOutAlgorithm(){
         orderNodes();
-        inAlive = new ArrayList<>();
-        outAlive = new ArrayList<>();
-        defined = new ArrayList<>();
-        used = new ArrayList<>();
 
         for(int i = 0; i < nodeOrder.size(); i++){
             inAlive.add(new HashSet<>());

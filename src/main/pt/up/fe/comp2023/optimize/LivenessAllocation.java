@@ -6,8 +6,6 @@ import pt.up.fe.comp.jmm.ollir.OllirResult;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static java.lang.Integer.parseInt;
-
 public class LivenessAllocation {
 
     private final OllirResult ollirResult;
@@ -46,13 +44,16 @@ public class LivenessAllocation {
 
     public void registerAlloc() {
         for(MethodLivenessAllocation method: methodLivenessAllocations){
-            HashMap<String, Descriptor> variableTable = method.getMethod().getVarTable();
-            for(RegisterNode node: method.getInterferenceGraph().vars()){
-                variableTable.get(node.getName()).setVirtualReg(node.getRegister());
+            HashMap<String, Descriptor> variableTable = method.getVariableTable();
+
+            for(RegisterNode regNode: method.getInterferenceGraph().vars()){
+                variableTable.get(regNode.getName()).setVirtualReg(regNode.getRegister());
             }
-            for(RegisterNode node: method.getInterferenceGraph().params()){
-                variableTable.get(node.getName()).setVirtualReg(node.getRegister());
+
+            for(RegisterNode regNode: method.getInterferenceGraph().params()){
+                variableTable.get(regNode.getName()).setVirtualReg(regNode.getRegister());
             }
+
             if(variableTable.get("this") != null){
                 variableTable.get("this").setVirtualReg(0);
             }
