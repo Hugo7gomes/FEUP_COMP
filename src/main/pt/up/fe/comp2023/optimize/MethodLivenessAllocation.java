@@ -214,8 +214,9 @@ public class MethodLivenessAllocation {
         List<Element> methodParams = this.method.getParams();
 
         for(Element param: methodParams){
-            if(param instanceof Operand){
-                paramNames.add(getElemName(param));
+            if(param instanceof Operand operand){
+                String paramName = getElemName(param);
+                paramNames.add(paramName);
             }
         }
         return paramNames;
@@ -260,6 +261,8 @@ public class MethodLivenessAllocation {
         }
 
     }
+
+    //=============================================
 
     // Method to color the interference graph. Each color corresponds to a register, and two
     // nodes that have an edge between them must have different colors
