@@ -37,6 +37,7 @@ public class MethodLivenessAllocation {
         return method.getVarTable();
     }
 
+    // Method to perform Depth First Search to order the nodes for further processing
     private void dfsOrderNodes(Node node, ArrayList<Node> visited) {
 
         if (node == null) return;
@@ -53,6 +54,7 @@ public class MethodLivenessAllocation {
         this.nodeOrder.add(node);
     }
 
+    // Helper method to order nodes
     private void orderNodes() {
         Node node = method.getBeginNode();
         this.nodeOrder = new ArrayList<>();
@@ -60,6 +62,7 @@ public class MethodLivenessAllocation {
         dfsOrderNodes(node, visited);
     }
 
+    // Method to add elements to the use/define set
     private void addUseDefSet(Node node, Element element, ArrayList<Set<String>> useDefSet){
         int index = nodeOrder.indexOf(node);
         if(element instanceof ArrayOperand arrayOperand){
@@ -75,6 +78,7 @@ public class MethodLivenessAllocation {
         }
     }
 
+    // Method to perform the use-define analysis on the given node
     public void useDefAlgorithm(Node node, Node parentNode){
 
         if(node == null) return;
@@ -148,6 +152,7 @@ public class MethodLivenessAllocation {
         }
     }
 
+    // Method to compute the in and out sets for each instruction
     public void inOutAlgorithm(){
         orderNodes();
         this.inAlive = new ArrayList<>();
@@ -197,23 +202,27 @@ public class MethodLivenessAllocation {
 
     //=============================================
 
+    // Helper method to get the name of an element
     private String getElemName(Element elem){
         if(elem instanceof Operand operand) return operand.getName();
         return null;
     }
 
+    // Helper method to get the names of parameters
     private List<String> getParamNames(){
         List<String> paramNames = new ArrayList<>();
         List<Element> methodParams = this.method.getParams();
 
         for(Element param: methodParams){
-            if(param instanceof Operand operand){
+            if(param instanceof Operand){
                 paramNames.add(getElemName(param));
             }
         }
         return paramNames;
     }
 
+    // Method to create an interference graph where each node is a variable and an edge between
+    // two nodes means the corresponding variables are live at the same time
     public void setInterferenceGraph(){
         Set<String> vars = new HashSet<>();
         Set<String> params = new HashSet<>();
@@ -226,8 +235,6 @@ public class MethodLivenessAllocation {
             } else if (!variable.equals("this")) vars.add(variable);
         }
 
-        //------//------
-
         Set<RegisterNode> registerVars = new HashSet<>();
         Set<RegisterNode> registerParams = new HashSet<>();
 
@@ -239,8 +246,6 @@ public class MethodLivenessAllocation {
         }
 
         this.interferenceGraph = new InterferenceGraph(registerVars, registerParams);
-
-        //------//------
 
         for(RegisterNode varX: this.interferenceGraph.vars()){
             for(RegisterNode varY: this.interferenceGraph.vars()){
@@ -256,6 +261,8 @@ public class MethodLivenessAllocation {
 
     }
 
+    // Method to color the interference graph. Each color corresponds to a register, and two
+    // nodes that have an edge between them must have different colors
     public void colorInterferenceGraph(int maxRegisters){
         Stack<RegisterNode> stack = new Stack<>();
         int registers = 0;

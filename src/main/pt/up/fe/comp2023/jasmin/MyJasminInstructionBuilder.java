@@ -352,20 +352,23 @@ public class MyJasminInstructionBuilder {
         return stringBuilder.toString();
     }
 
-    // Builds the Jasmin instructions for a SingleOpInstruction
+    // Builds the Jasmin instruction for a SingleOpInstruction
     private String buildSingleOp(SingleOpInstruction instruction){
         Element operand = instruction.getSingleOperand();
         return loadOp(operand);
     }
 
+    // Builds the Jasmin instruction for a GoToInstruction
     private String buildGoto(GotoInstruction instruction){
         return MyJasminInstruction.goTo(instruction.getLabel());
     }
 
+    // Build the Jasmin code for a IfNeInstruction
     private String buildCondition(Instruction instruction, String label){
         return buildInstruction(instruction) + MyJasminInstruction.ifne(label);
     }
 
+    // Builds the Jasmin code for a CondBranchInstruction
     private String buildBranch(CondBranchInstruction instruction){
         StringBuilder stringBuilder = new StringBuilder();
         Instruction cond = instruction.getCondition();
